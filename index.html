@@ -81,6 +81,14 @@
             outline: none;
             margin-bottom: 1rem;
         }
+        
+        /* Neatly group syncing fields and allow hiding them */
+        .sync-setup-group {
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 1rem;
+        }
+        
         .error-message { color: var(--danger); font-size: 0.9rem; margin-bottom: 1rem; font-style: italic; }
 
         /* --- Sidebar Styling --- */
@@ -193,7 +201,7 @@
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
             white-space: nowrap;
-            scrollbar-width: none; /* Hide standard scrollbar for clean view */
+            scrollbar-width: none; 
         }
         .editor-tools::-webkit-scrollbar { display: none; }
 
@@ -263,7 +271,7 @@
             font-style: italic;
         }
 
-        /* --- Cute Custom Bullets Style Injection --- */
+        /* --- Cute Custom Bullets --- */
         .editor-input ul {
             list-style: none;
             padding-left: 1.5rem;
@@ -358,7 +366,7 @@
             pointer-events: none;
         }
 
-        /* --- CONTROL HANDLES (Optimized for Mobile Touch) --- */
+        /* --- CONTROL HANDLES --- */
         .control-handle {
             position: absolute;
             width: 24px;
@@ -388,7 +396,7 @@
 
         #imageInput { display: none; }
 
-        /* --- RESPONSIVE PHONE & IPAD LAYOUTS --- */
+        /* --- RESPONSIVE LAYOUTS --- */
         @media (max-width: 850px) {
             body { position: relative; }
             .sidebar { 
@@ -426,18 +434,23 @@
 </head>
 <body>
 
-    <!-- Lock Screen / Database Config Setup -->
+    <!-- Lock Screen Component -->
     <div id="lockScreen">
         <div class="lock-container">
             <h1>Secret Garden 🔐</h1>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Syncing Setup & Security Key</p>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Enter your password to unlock</p>
             
-            <input type="text" id="dbUrl" class="password-input" placeholder="Supabase URL (for device sync)">
-            <input type="password" id="dbAnonKey" class="password-input" placeholder="Supabase Anon Key">
-            <input type="password" id="passwordField" class="password-input" placeholder="Journal Password Entry Key" maxlength="6">
+            <!-- This container holds keys during first setup and automatically hides later -->
+            <div id="syncSetupContainer" class="sync-setup-group">
+                <input type="text" id="dbUrl" class="password-input" placeholder="Supabase URL">
+                <input type="password" id="dbAnonKey" class="password-input" placeholder="Supabase Anon Key">
+                <p style="font-size:0.75rem; color:var(--accent-hover); font-style:italic;">Cloud credentials will disappear once saved successfully!</p>
+            </div>
+
+            <input type="password" id="passwordField" class="password-input" placeholder="6-Digit Secret Key" maxlength="6" onkeydown="if(event.key === 'Enter') initializeAndUnlock()">
             
             <div id="errMessage" class="error-message"></div>
-            <button class="btn-primary" style="width: 100%;" onclick="initializeAndUnlock()">Unlock & Sync Journal</button>
+            <button class="btn-primary" style="width: 100%;" onclick="initializeAndUnlock()">Unlock Entry</button>
         </div>
     </div>
 
@@ -469,7 +482,7 @@
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
                 
-                <!-- Cute Bullet Lists Drop Tools -->
+                <!-- Cute Bullet Lists Tools Section -->
                 <div class="bullet-tools">
                     <span>Lists:</span>
                     <button class="tool-btn" onclick="insertCuteBullet('🌸')">🌸</button>
@@ -500,10 +513,8 @@
             </div>
             
             <div class="workspace-split">
-                <!-- Rich Text Document Editor Box -->
                 <div class="editor-input" id="diaryText" contenteditable="true" placeholder="Pour your heart out here..."></div>
                 
-                <!-- Accessories Side Panel -->
                 <div class="scrapbook-sidebar">
                     <h4>Stickers ✨</h4>
                     <div class="sticker-grid">
@@ -528,9 +539,17 @@
         let entries = {};
         let currentEntryId = null;
 
-        // Load credentials from local storage if saved previously
-        document.getElementById('dbUrl').value = localStorage.getItem('sb_url') || '';
-        document.getElementById('dbAnonKey').value = localStorage.getItem('sb_key') || '';
+        // AUTOMATIC CREDENTIAL DETECTION LOGIC
+        const savedUrl = localStorage.getItem('sb_url') || '';
+        const savedKey = localStorage.getItem('sb_key') || '';
+
+        document.getElementById('dbUrl').value = savedUrl;
+        document.getElementById('dbAnonKey').value = savedKey;
+
+        // Hide credentials container automatically if keys are already remembered inside device storage
+        if (savedUrl && savedKey) {
+            document.getElementById('syncSetupContainer').style.display = 'none';
+        }
 
         async function initializeAndUnlock() {
             const url = document.getElementById('dbUrl').value.trim();
@@ -549,7 +568,7 @@
                     localStorage.setItem('sb_key', key);
                     await pullDataFromCloud();
                 } catch (err) {
-                    console.warn("Cloud connection failed, falling back to offline browser cache storage.");
+                    console.warn("Cloud connection issue. Reverting to local device cache.");
                     loadLocalFallback();
                 }
             } else {
@@ -616,7 +635,6 @@
 
             range.insertNode(ul);
             
-            // Reposition cursor nicely right inside the item text boundary
             range.selectNodeContents(li);
             selection.removeAllRanges();
             selection.addRange(range);
@@ -687,7 +705,6 @@
             let isDragging = false, isResizing = false, isRotating = false;
             let startX, startY, startLeft, startTop, startSize, startAngle;
 
-            // Setup combined multi-platform Touch / Mouse monitors
             elmnt.addEventListener('mousedown', initDrag);
             elmnt.addEventListener('touchstart', initDrag, { passive: false });
 
@@ -809,7 +826,7 @@
 
         function clearAllFloatingAssets() { document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove()); }
 
-        // --- GENERAL ENTRY ACTIONS ---
+        // --- GENERAL DIARY UTILITIES ---
         function renderEntryList() {
             const listContainer = document.getElementById('entryList');
             const searchQuery = document.getElementById('search').value.toLowerCase();
