@@ -66,7 +66,12 @@
             box-shadow: 0 10px 25px rgba(247, 177, 189, 0.3);
         }
 
-        .lock-container h1 { font-size: 1.6rem; font-style: italic; margin-bottom: 0.5rem; }
+        .lock-container h1 {
+            font-size: 1.6rem;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
         .password-input {
             width: 100%;
             padding: 0.8rem 1.2rem;
@@ -80,7 +85,13 @@
             outline: none;
             margin-bottom: 1.5rem;
         }
-        .error-message { color: var(--danger); font-size: 0.9rem; margin-bottom: 1rem; font-style: italic; }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
 
         /* --- Sidebar Styling --- */
         .sidebar {
@@ -115,7 +126,12 @@
             outline: none;
         }
 
-        .entry-list { flex: 1; overflow-y: auto; margin-bottom: 1rem; }
+        .entry-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
         .entry-item {
             padding: 1rem;
             background: var(--bg-card);
@@ -124,8 +140,18 @@
             margin-bottom: 0.75rem;
             cursor: pointer;
         }
-        .entry-item.active { border-color: var(--accent-hover); background: #fff9fa; }
-        .entry-item .date { font-size: 0.8rem; color: var(--accent-hover); font-weight: bold; }
+
+        .entry-item.active {
+            border-color: var(--accent-hover);
+            background: #fff9fa;
+        }
+
+        .entry-item .date {
+            font-size: 0.8rem;
+            color: var(--accent-hover);
+            font-weight: bold;
+        }
+
         .entry-item .preview {
             font-size: 0.9rem;
             color: var(--text-muted);
@@ -134,7 +160,7 @@
             text-overflow: ellipsis;
         }
 
-        /* --- Main Content --- */
+        /* --- Main Workspace --- */
         .main-content {
             flex: 1;
             display: flex;
@@ -143,13 +169,30 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            position: relative;
         }
 
-        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; z-index: 5; }
-        .left-toolbar-group { display: flex; align-items: center; gap: 0.75rem; }
-        .current-date { font-size: 1.3rem; font-style: italic; }
-        .btn-group { display: flex; gap: 0.5rem; }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .left-toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .current-date {
+            font-size: 1.3rem;
+            font-style: italic;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
 
         button, .toggle-sidebar-btn {
             padding: 0.7rem 1.2rem;
@@ -169,7 +212,7 @@
         .btn-danger { background-color: transparent; color: var(--danger); }
         .toggle-sidebar-btn { background-color: var(--bg-sidebar); border: 1px solid var(--border); color: var(--text-main); }
 
-        /* --- Text Editor Area --- */
+        /* --- Text Editor Container --- */
         .editor-container {
             flex: 1;
             display: flex;
@@ -179,7 +222,6 @@
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(247, 177, 189, 0.15);
-            z-index: 2;
         }
 
         .editor-tools {
@@ -193,7 +235,7 @@
             flex-wrap: wrap;
         }
 
-        .tool-btn, .tool-select {
+        .tool-btn {
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text-main);
@@ -202,11 +244,26 @@
             font-size: 0.9rem;
             min-height: 35px;
             cursor: pointer;
-            outline: none;
         }
 
-        .workspace-split { display: flex; flex: 1; overflow: hidden; }
+        .tool-select {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.4rem;
+            border-radius: 12px;
+            outline: none;
+            font-size: 0.9rem;
+            min-height: 35px;
+        }
 
+        .workspace-split {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ContentEditable Box for Rich Styling */
         .editor-input {
             flex: 1;
             background: transparent;
@@ -220,32 +277,22 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Custom style for images inside the text area */
-        .editor-input img {
-            max-width: 80%;
-            max-height: 300px;
-            border-radius: 12px;
-            border: 2px solid var(--border);
-            display: block;
-            margin: 1rem 0;
-        }
-
         .editor-input[placeholder]:empty:before {
             content: attr(placeholder);
             color: var(--text-muted);
             font-style: italic;
         }
 
-        /* --- Sticker Tray Side Panel --- */
+        /* Scrapbook Side Panel (Photos & Stickers) */
         .scrapbook-sidebar {
-            width: 160px;
+            width: 220px;
             background: #fffdfd;
             border-left: 1px dashed var(--border);
             padding: 1rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.2rem;
         }
 
         .scrapbook-sidebar h4 {
@@ -259,45 +306,57 @@
 
         .sticker-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
             justify-items: center;
         }
 
-        .tray-sticker {
-            font-size: 2.2rem;
-            cursor: grab;
+        .sticker-item {
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
             user-select: none;
-            transition: transform 0.2s;
         }
-        .tray-sticker:hover { transform: scale(1.15); }
 
-        /* --- Free Floating Placed Stickers --- */
-        .floating-sticker {
-            position: absolute;
-            font-size: 2.5rem;
-            cursor: move;
-            user-select: none;
-            z-index: 100;
-            touch-action: none; /* Prevents scrolling while dragging on iPad */
+        .sticker-item:hover {
+            transform: scale(1.3 /* Zoom sticker preview slightly on click hover */);
         }
-        .floating-sticker .delete-sticker-btn {
+
+        /* Inline embedded assets layouts */
+        .embedded-sticker {
+            display: inline-block;
+            font-size: 2rem;
+            vertical-align: middle;
+            margin: 0 0.25rem;
+            user-select: none;
+        }
+
+        .inserted-photo-wrapper {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+        }
+
+        .inserted-photo-wrapper img {
+            width: 100%;
+            display: block;
+        }
+
+        .delete-photo-btn {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: 4px;
+            right: 4px;
             background: rgba(255,255,255,0.9);
             color: var(--danger);
-            border: 1px solid var(--border);
+            border: none;
             border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            font-size: 0.6rem;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            width: 24px;
+            height: 24px;
+            font-weight: bold;
             cursor: pointer;
         }
-        .floating-sticker:hover .delete-sticker-btn { display: flex; }
 
         #imageInput { display: none; }
 
@@ -305,8 +364,7 @@
             .sidebar { position: absolute; left: 0; top: 0; transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
             .workspace-split { flex-direction: column; }
-            .scrapbook-sidebar { width: 100%; height: 110px; border-left: none; border-top: 1px dashed var(--border); flex-direction: row; }
-            .sticker-grid { grid-template-columns: repeat(8, 1fr); width: 100%; }
+            .scrapbook-sidebar { width: 100%; height: 160px; border-left: none; border-top: 1px dashed var(--border); flex-direction: row; }
         }
     </style>
 </head>
@@ -332,8 +390,8 @@
         <button class="btn-secondary" onclick="exportBackup()">📥 Download Backup</button>
     </div>
 
-    <!-- Main Section -->
-    <div class="main-content" id="mainWorkspace">
+    <!-- Workspace -->
+    <div class="main-content">
         <div class="toolbar">
             <div class="left-toolbar-group">
                 <button class="toggle-sidebar-btn" onclick="toggleSidebar()">📖 Journal</button>
@@ -346,48 +404,54 @@
         </div>
 
         <div class="editor-container" id="editorContainer" style="display: none;">
-            <!-- Format Tools Bar -->
+            <!-- Extended Styling Toolbar -->
             <div class="editor-tools">
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
                 
-                <select class="tool-select" id="fontSelector" onchange="formatDoc('fontName', this.value)">
-                    <option value="Georgia">Georgia</option>
-                    <option value="'Courier New', monospace">Courier</option>
-                    <option value="'Comic Sans MS', cursive">Comic Sans</option>
-                    <option value="sans-serif">Arial</option>
+                <!-- Font Dropdown picker -->
+                <select class="tool-select" id="fontSelector" onchange="changeFont(this.value)">
+                    <option value="Georgia">Georgia (Classic)</option>
+                    <option value="'Courier New', monospace">Courier (Typewriter)</option>
+                    <option value="'Comic Sans MS', cursive">Comic Sans (Cute)</option>
+                    <option value="sans-serif">Arial (Clean)</option>
                 </select>
 
-                <select class="tool-select" id="highlightSelector" onchange="formatDoc('hiliteColor', this.value); this.value='';">
+                <!-- Highlight Selector -->
+                <select class="tool-select" id="highlightSelector" onchange="applyHighlight(this.value); this.value='';">
                     <option value="">✨ Highlight</option>
-                    <option value="var(--hl-pink)">🌸 Pink</option>
-                    <option value="var(--hl-yellow)">💛 Yellow</option>
-                    <option value="var(--hl-green)">🌿 Green</option>
+                    <option value="var(--hl-pink)">🌸 Pink Tint</option>
+                    <option value="var(--hl-yellow)">💛 Soft Yellow</option>
+                    <option value="var(--hl-green)">🌿 Soft Green</option>
                     <option value="transparent">❌ Clear</option>
                 </select>
 
-                <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Photo Inline</button>
-                <input type="file" id="imageInput" accept="image/*" onchange="handleInlineImageUpload(event)">
+                <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Photo</button>
+                <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
             </div>
             
             <div class="workspace-split">
-                <!-- Rich Text Box -->
+                <!-- Rich Text Editable Block -->
                 <div class="editor-input" id="diaryText" contenteditable="true" placeholder="Pour your heart out here..."></div>
                 
-                <!-- Sticker Drawer Section -->
+                <!-- Scrapbook Accessories Panel -->
                 <div class="scrapbook-sidebar">
-                    <h4>Stickers ✨</h4>
-                    <div class="sticker-grid">
-                        <div class="tray-sticker" onclick="spawnSticker('🌸')">🌸</div>
-                        <div class="tray-sticker" onclick="spawnSticker('💖')">💖</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🎀')">🎀</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🧸')">🧸</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🐱')">🐱</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🧁')">🧁</div>
-                        <div class="tray-sticker" onclick="spawnSticker('⭐')">⭐</div>
-                        <div class="tray-sticker" onclick="spawnSticker('☁️')">☁️</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🎨')">🎨</div>
-                        <div class="tray-sticker" onclick="spawnSticker('💘')">💘</div>
+                    <div>
+                        <h4>Stickers ✨</h4>
+                        <div class="sticker-grid">
+                            <div class="sticker-item" onclick="insertSticker('🌸')">🌸</div>
+                            <div class="sticker-item" onclick="insertSticker('💖')">💖</div>
+                            <div class="sticker-item" onclick="insertSticker('🧸')">🧸</div>
+                            <div class="sticker-item" onclick="insertSticker('🎀')">🎀</div>
+                            <div class="sticker-item" onclick="insertSticker('🐱')">🐱</div>
+                            <div class="sticker-item" onclick="insertSticker('🍰')">🍰</div>
+                            <div class="sticker-item" onclick="insertSticker('☕')">☕</div>
+                            <div class="sticker-item" onclick="insertSticker('⭐')">⭐</div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Photos 📸</h4>
+                        <div id="attachedPhotosContainer"></div>
                     </div>
                 </div>
             </div>
@@ -414,137 +478,37 @@
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); document.getElementById('diaryText').focus(); }
 
-        // --- INLINE IMAGE HANDLING ---
-        function handleInlineImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (file.size > 2 * 1024 * 1024) { 
-                alert("Please select images under 2MB to ensure quick loading!");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('diaryText').focus();
-                const imgHtml = `<img src="${e.target.result}" alt="embedded image" /><br>`;
-                document.execCommand('insertHTML', false, imgHtml);
-                saveCurrentEntry();
-            };
-            reader.readAsDataURL(file);
-            event.target.value = '';
+        function formatDoc(cmd, value = null) {
+            document.execCommand(cmd, false, value);
+            document.getElementById('diaryText').focus();
         }
 
-        // --- DRAG AND DROP STICKERS LOGIC ---
-        function spawnSticker(emoji, x = 150, y = 150) {
-            if (!currentEntryId) return;
-            
-            const stickerId = 'sticker_' + Date.now() + Math.random().toString(36).substr(2, 5);
-            createFloatingStickerElement(stickerId, emoji, x, y);
-            
-            if (!entries[currentEntryId].stickers) entries[currentEntryId].stickers = [];
-            entries[currentEntryId].stickers.push({ id: stickerId, emoji: emoji, x: x, y: y });
-            saveToStorage();
+        function changeFont(fontName) {
+            formatDoc('fontName', fontName);
         }
 
-        function createFloatingStickerElement(id, emoji, x, y) {
-            const sticker = document.createElement('div');
-            sticker.className = 'floating-sticker';
-            sticker.id = id;
-            sticker.style.left = x + 'px';
-            sticker.style.top = y + 'px';
-            sticker.innerHTML = `${emoji}<div class="delete-sticker-btn" onclick="removeSticker('${id}', event)">×</div>`;
-            
-            document.getElementById('mainWorkspace').appendChild(sticker);
-            makeElementDraggable(sticker);
+        function applyHighlight(color) {
+            if(color) formatDoc('hiliteColor', color);
         }
 
-        function removeSticker(id, event) {
-            event.stopPropagation();
-            const element = document.getElementById(id);
-            if (element) element.remove();
-            
-            if (currentEntryId && entries[currentEntryId].stickers) {
-                entries[currentEntryId].stickers = entries[currentEntryId].stickers.filter(s => s.id !== id);
-                saveToStorage();
-            }
+        // Drop animated/inline decorative elements directly inside cursor text area
+        function insertSticker(emoji) {
+            document.getElementById('diaryText').focus();
+            const stickerHtml = `<span class="embedded-sticker" contenteditable="false">${emoji}</span>&nbsp;`;
+            document.execCommand('insertHTML', false, stickerHtml);
         }
 
-        function clearAllFloatingStickers() {
-            document.querySelectorAll('.floating-sticker').forEach(el => el.remove());
-        }
-
-        function makeElementDraggable(elmnt) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            
-            // iPad touch setup & Desktop mouse setup
-            elmnt.onmousedown = dragMouseDown;
-            elmnt.ontouchstart = dragTouchStart;
-
-            function dragMouseDown(e) {
-                e.preventDefault();
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
-            }
-
-            function dragTouchStart(e) {
-                pos3 = e.touches[0].clientX;
-                pos4 = e.touches[0].clientY;
-                document.ontouchend = closeDragElement;
-                document.ontouchmove = elementTouchDrag;
-            }
-
-            function elementDrag(e) {
-                e.preventDefault();
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                updateStickerPosition(elmnt.offsetTop - pos2, elmnt.offsetLeft - pos1);
-            }
-
-            function elementTouchDrag(e) {
-                pos1 = pos3 - e.touches[0].clientX;
-                pos2 = pos4 - e.touches[0].clientY;
-                pos3 = e.touches[0].clientX;
-                pos4 = e.touches[0].clientY;
-                updateStickerPosition(elmnt.offsetTop - pos2, elmnt.offsetLeft - pos1);
-            }
-
-            function updateStickerPosition(top, left) {
-                elmnt.style.top = top + "px";
-                elmnt.style.left = left + "px";
-            }
-
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-                document.ontouchend = null;
-                document.ontouchmove = null;
-                
-                // Save coordinates to storage data model 
-                if (currentEntryId && entries[currentEntryId].stickers) {
-                    const match = entries[currentEntryId].stickers.find(s => s.id === elmnt.id);
-                    if (match) {
-                        match.x = parseInt(elmnt.style.left);
-                        match.y = parseInt(elmnt.style.top);
-                        saveToStorage();
-                    }
-                }
-            }
-        }
-
-        // --- DIARY ENGINE UTILITIES ---
         function renderEntryList() {
             const listContainer = document.getElementById('entryList');
             const searchQuery = document.getElementById('search').value.toLowerCase();
             listContainer.innerHTML = '';
 
             const sortedDates = Object.keys(entries).sort((a, b) => new Date(b) - new Date(a));
+
             sortedDates.forEach(date => {
                 const entryData = entries[date];
+                // Strip HTML tags for clean raw summary preview text inside sidebar
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = entryData.text || '';
                 const textContent = tempDiv.innerText || tempDiv.textContent || '';
@@ -558,9 +522,12 @@
                         weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
                     });
 
+                    const photoCount = entryData.images ? entryData.images.length : 0;
+                    const attachmentText = photoCount > 0 ? ` [📷 ${photoCount}]` : '';
+
                     item.innerHTML = `
                         <div class="date">${formattedDate}</div>
-                        <div class="preview">${textContent.trim() || 'Empty page...'}</div>
+                        <div class="preview">${textContent.trim() || 'Empty canvas...'} <span style="color:var(--accent-hover);">${attachmentText}</span></div>
                     `;
                     listContainer.appendChild(item);
                 }
@@ -574,14 +541,13 @@
                 if(window.innerWidth <= 850) toggleSidebar();
                 return;
             }
-            entries[dateStr] = { text: "", stickers: [] };
+            entries[dateStr] = { text: "", images: [] };
             saveToStorage();
             loadEntry(dateStr);
             if(window.innerWidth <= 850) toggleSidebar();
         }
 
         function loadEntry(dateStr) {
-            clearAllFloatingStickers();
             currentEntryId = dateStr;
             const formattedDate = new Date(dateStr).toLocaleDateString('en-US', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -594,13 +560,50 @@
             document.getElementById('saveBtn').style.display = 'block';
             document.getElementById('deleteBtn').style.display = 'block';
 
-            // Re-spawn saved sticker layers
-            if (entries[dateStr].stickers) {
-                entries[dateStr].stickers.forEach(s => {
-                    createFloatingStickerElement(s.id, s.emoji, s.x, s.y);
-                });
-            }
+            renderPhotos();
             renderEntryList();
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 1.5 * 1024 * 1024) { 
+                alert("Please compress photos under 1.5MB to save local memory room!");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (!entries[currentEntryId].images) entries[currentEntryId].images = [];
+                entries[currentEntryId].images.push(e.target.result);
+                saveCurrentEntry();
+                renderPhotos();
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function renderPhotos() {
+            const container = document.getElementById('attachedPhotosContainer');
+            container.innerHTML = '';
+            if (!currentEntryId || !entries[currentEntryId].images) return;
+
+            entries[currentEntryId].images.forEach((imgSrc, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'inserted-photo-wrapper';
+                wrapper.innerHTML = `
+                    <img src="${imgSrc}" alt="Attachment">
+                    <button class="delete-photo-btn" onclick="deletePhoto(${index})">×</button>
+                `;
+                container.appendChild(wrapper);
+            });
+        }
+
+        function deletePhoto(index) {
+            if (confirm("Remove picture?")) {
+                entries[currentEntryId].images.splice(index, 1);
+                saveCurrentEntry();
+                renderPhotos();
+            }
         }
 
         function saveCurrentEntry() {
@@ -617,7 +620,6 @@
         function deleteCurrentEntry() {
             if (!currentEntryId) return;
             if (confirm("Delete this diary page?")) {
-                clearAllFloatingStickers();
                 delete entries[currentEntryId];
                 saveToStorage();
                 currentEntryId = null;
@@ -626,6 +628,7 @@
                 document.getElementById('editorContainer').style.display = 'none';
                 document.getElementById('saveBtn').style.display = 'none';
                 document.getElementById('deleteBtn').style.display = 'none';
+                renderPhotos();
                 renderEntryList();
             }
         }
