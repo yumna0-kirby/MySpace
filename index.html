@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Private Garden of Thoughts</title>
+    <!-- Include Supabase for Real-Time Cross-Device Syncing -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-main: #fff5f6;
@@ -59,10 +61,10 @@
             background: var(--bg-card);
             border: 2px solid var(--border);
             border-radius: 24px;
-            padding: 3rem 2rem;
+            padding: 2.5rem 1.5rem;
             text-align: center;
-            max-width: 400px;
-            width: 90%;
+            max-width: 420px;
+            width: 92%;
             box-shadow: 0 10px 25px rgba(247, 177, 189, 0.3);
         }
 
@@ -74,11 +76,10 @@
             border-radius: 20px;
             background-color: var(--bg-main);
             color: var(--text-main);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             text-align: center;
-            letter-spacing: 4px;
             outline: none;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
         .error-message { color: var(--danger); font-size: 0.9rem; margin-bottom: 1rem; font-style: italic; }
 
@@ -91,8 +92,8 @@
             flex-direction: column;
             padding: 1.5rem;
             height: 100%;
-            transition: transform 0.3s ease;
-            z-index: 10;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
         }
 
         .sidebar h2 {
@@ -146,13 +147,13 @@
             position: relative;
         }
 
-        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; z-index: 5; }
-        .left-toolbar-group { display: flex; align-items: center; gap: 0.75rem; }
-        .current-date { font-size: 1.3rem; font-style: italic; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; z-index: 5; gap: 0.5rem; }
+        .left-toolbar-group { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+        .current-date { font-size: 1.1rem; font-style: italic; }
         .btn-group { display: flex; gap: 0.5rem; }
 
         button, .toggle-sidebar-btn {
-            padding: 0.7rem 1.2rem;
+            padding: 0.6rem 1rem;
             border-radius: 20px;
             border: none;
             cursor: pointer;
@@ -161,7 +162,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 44px;
+            min-height: 40px;
+            white-space: nowrap;
         }
 
         .btn-primary { background-color: var(--accent); color: white; }
@@ -185,13 +187,15 @@
         .editor-tools {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.6rem;
             padding: 0.6rem 1rem;
             background: var(--bg-sidebar);
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
-            flex-wrap: wrap;
+            white-space: nowrap;
+            scrollbar-width: none; /* Hide standard scrollbar for clean view */
         }
+        .editor-tools::-webkit-scrollbar { display: none; }
 
         .tool-btn, .tool-select {
             background: var(--bg-card);
@@ -199,11 +203,23 @@
             color: var(--text-main);
             padding: 0.4rem 0.8rem;
             border-radius: 12px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             min-height: 35px;
             cursor: pointer;
             outline: none;
         }
+
+        /* Cute Emoji Bullet Tool section */
+        .bullet-tools {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: var(--bg-card);
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+        .bullet-tools span { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-right: 0.2rem; }
 
         .highlight-palette {
             display: flex;
@@ -226,18 +242,17 @@
 
         .workspace-split { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* CRITICAL FIXED COMPONENT: Scroll container holds absolute children safely */
         .editor-input {
             flex: 1;
             background: transparent;
             border: none;
             color: var(--text-main);
             padding: 1.5rem;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             line-height: 1.7;
             outline: none;
             overflow-y: auto;
-            position: relative; /* Targets children alignment inside scrolling view */
+            position: relative; 
             -webkit-overflow-scrolling: touch;
             z-index: 1;
         }
@@ -248,9 +263,26 @@
             font-style: italic;
         }
 
+        /* --- Cute Custom Bullets Style Injection --- */
+        .editor-input ul {
+            list-style: none;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        .editor-input ul li {
+            position: relative;
+            margin-bottom: 0.4rem;
+        }
+        .editor-input ul li::before {
+            content: attr(data-emoji);
+            position: absolute;
+            left: -1.5rem;
+            top: 0;
+        }
+
         /* --- Sticker Side Drawer --- */
         .scrapbook-sidebar {
-            width: 160px;
+            width: 150px;
             background: #fffdfd;
             border-left: 1px dashed var(--border);
             padding: 1rem;
@@ -278,24 +310,24 @@
         }
 
         .tray-sticker {
-            font-size: 2.2rem;
+            font-size: 2rem;
             cursor: grab;
             user-select: none;
+            transition: transform 0.1s ease;
         }
+        .tray-sticker:active { transform: scale(1.2); }
 
-        /* --- ADVANCED ADJUSTABLE SCUBBOOK ASSETS --- */
+        /* --- ADJUSTABLE ASSETS --- */
         .scrapbook-asset {
             position: absolute;
             cursor: move;
             z-index: 50;
             touch-action: none;
             display: inline-block;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid transparent;
-            transition: border-color 0.15s ease;
         }
 
-        /* Show selection bounding box outline on focus/hover */
         .scrapbook-asset:hover, .scrapbook-asset:active {
             border: 1px dashed var(--accent);
             border-radius: 6px;
@@ -309,13 +341,10 @@
             justify-content: center;
         }
 
-        .scrapbook-asset.sticker-asset .asset-wrapper {
-            line-height: 1;
-        }
-
+        .scrapbook-asset.sticker-asset .asset-wrapper { line-height: 1; }
         .scrapbook-asset.photo-asset .asset-wrapper {
             background: white;
-            padding: 8px 8px 20px 8px;
+            padding: 6px 6px 18px 6px;
             border: 1px solid var(--border);
             box-shadow: 0 4px 10px rgba(247, 177, 189, 0.25);
             border-radius: 4px;
@@ -329,20 +358,20 @@
             pointer-events: none;
         }
 
-        /* --- CONTROL HANDLES --- */
+        /* --- CONTROL HANDLES (Optimized for Mobile Touch) --- */
         .control-handle {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             background: white;
             border: 1px solid var(--border);
             border-radius: 50%;
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             z-index: 60;
             color: var(--text-main);
             user-select: none;
@@ -353,48 +382,62 @@
             display: flex;
         }
 
-        .handle-delete {
-            top: -10px;
-            right: -10px;
-            background: var(--danger);
-            color: white;
-        }
-
-        .handle-resize {
-            bottom: -10px;
-            right: -10px;
-            cursor: se-resize;
-            background: #fff3b0;
-        }
-
-        .handle-rotate {
-            top: -10px;
-            left: -10px;
-            cursor: grab;
-            background: #c7f9cc;
-        }
+        .handle-delete { top: -12px; right: -12px; background: var(--danger); color: white; }
+        .handle-resize { bottom: -12px; right: -12px; cursor: se-resize; background: #fff3b0; }
+        .handle-rotate { top: -12px; left: -12px; cursor: grab; background: #c7f9cc; }
 
         #imageInput { display: none; }
 
+        /* --- RESPONSIVE PHONE & IPAD LAYOUTS --- */
         @media (max-width: 850px) {
-            .sidebar { position: absolute; left: 0; top: 0; transform: translateX(-100%); }
+            body { position: relative; }
+            .sidebar { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                transform: translateX(-100%); 
+                width: 280px;
+                box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            }
             .sidebar.open { transform: translateX(0); }
             .workspace-split { flex-direction: column; }
-            .scrapbook-sidebar { width: 100%; height: 110px; border-left: none; border-top: 1px dashed var(--border); flex-direction: row; }
-            .sticker-grid { grid-template-columns: repeat(8, 1fr); width: 100%; }
+            .scrapbook-sidebar { 
+                width: 100%; 
+                height: 85px; 
+                border-left: none; 
+                border-top: 1px dashed var(--border); 
+                padding: 0.5rem; 
+                flex-direction: row; 
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .scrapbook-sidebar h4 { display: none; }
+            .sticker-grid { 
+                display: flex; 
+                flex-direction: row; 
+                overflow-x: auto; 
+                width: 100%; 
+                gap: 1rem; 
+                padding: 0 0.5rem;
+            }
+            .tray-sticker { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Lock Screen -->
+    <!-- Lock Screen / Database Config Setup -->
     <div id="lockScreen">
         <div class="lock-container">
             <h1>Secret Garden 🔐</h1>
-            <p>Enter password to unlock your notes...</p>
-            <input type="password" id="passwordField" class="password-input" placeholder="••••••" maxlength="6" autofocus onkeydown="if(event.key === 'Enter') checkPassword()">
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Syncing Setup & Security Key</p>
+            
+            <input type="text" id="dbUrl" class="password-input" placeholder="Supabase URL (for device sync)">
+            <input type="password" id="dbAnonKey" class="password-input" placeholder="Supabase Anon Key">
+            <input type="password" id="passwordField" class="password-input" placeholder="Journal Password Entry Key" maxlength="6">
+            
             <div id="errMessage" class="error-message"></div>
-            <button class="btn-primary" style="width: 100%;" onclick="checkPassword()">Unlock Entry</button>
+            <button class="btn-primary" style="width: 100%;" onclick="initializeAndUnlock()">Unlock & Sync Journal</button>
         </div>
     </div>
 
@@ -426,6 +469,15 @@
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
                 
+                <!-- Cute Bullet Lists Drop Tools -->
+                <div class="bullet-tools">
+                    <span>Lists:</span>
+                    <button class="tool-btn" onclick="insertCuteBullet('🌸')">🌸</button>
+                    <button class="tool-btn" onclick="insertCuteBullet('🎀')">🎀</button>
+                    <button class="tool-btn" onclick="insertCuteBullet('⭐')">⭐</button>
+                    <button class="tool-btn" onclick="insertCuteBullet('🧸')">🧸</button>
+                </div>
+
                 <select class="tool-select" id="fontSelector" onchange="formatDoc('fontName', this.value)">
                     <option value="Georgia">Georgia</option>
                     <option value="'Courier New', monospace">Courier</option>
@@ -448,7 +500,7 @@
             </div>
             
             <div class="workspace-split">
-                <!-- Rich Text Document Container Layer (Parents items securely) -->
+                <!-- Rich Text Document Editor Box -->
                 <div class="editor-input" id="diaryText" contenteditable="true" placeholder="Pour your heart out here..."></div>
                 
                 <!-- Accessories Side Panel -->
@@ -472,62 +524,134 @@
     </div>
 
     <script>
-        let entries = JSON.parse(localStorage.getItem('private_floral_diary_entries')) || {};
+        let supabaseClient = null;
+        let entries = {};
         let currentEntryId = null;
 
-        function checkPassword() {
-            const entered = document.getElementById('passwordField').value;
-            if (entered === "200600") {
-                const lockScreen = document.getElementById('lockScreen');
-                lockScreen.style.opacity = '0';
-                setTimeout(() => lockScreen.style.visibility = 'hidden', 500);
-                renderEntryList();
-                const todayStr = new Date().toISOString().split('T')[0];
-                if (entries[todayStr]) loadEntry(todayStr);
-            } else {
+        // Load credentials from local storage if saved previously
+        document.getElementById('dbUrl').value = localStorage.getItem('sb_url') || '';
+        document.getElementById('dbAnonKey').value = localStorage.getItem('sb_key') || '';
+
+        async function initializeAndUnlock() {
+            const url = document.getElementById('dbUrl').value.trim();
+            const key = document.getElementById('dbAnonKey').value.trim();
+            const password = document.getElementById('passwordField').value;
+
+            if (password !== "200600") {
                 document.getElementById('errMessage').innerText = "Incorrect secret key... 💕";
-                document.getElementById('passwordField').value = '';
+                return;
             }
+
+            if (url && key) {
+                try {
+                    supabaseClient = supabase.createClient(url, key);
+                    localStorage.setItem('sb_url', url);
+                    localStorage.setItem('sb_key', key);
+                    await pullDataFromCloud();
+                } catch (err) {
+                    console.warn("Cloud connection failed, falling back to offline browser cache storage.");
+                    loadLocalFallback();
+                }
+            } else {
+                loadLocalFallback();
+            }
+
+            const lockScreen = document.getElementById('lockScreen');
+            lockScreen.style.opacity = '0';
+            setTimeout(() => lockScreen.style.visibility = 'hidden', 500);
+            
+            renderEntryList();
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (entries[todayStr]) loadEntry(todayStr);
+        }
+
+        function loadLocalFallback() {
+            entries = JSON.parse(localStorage.getItem('private_floral_diary_entries')) || {};
+        }
+
+        async function pullDataFromCloud() {
+            if (!supabaseClient) return;
+            const { data, error } = await supabaseClient.from('diary_entries').select('*');
+            if (!error && data) {
+                entries = {};
+                data.forEach(row => {
+                    entries[row.entry_date] = {
+                        text: row.text_content,
+                        canvasAssets: typeof row.assets === 'string' ? JSON.parse(row.assets) : row.assets || []
+                    };
+                });
+            }
+        }
+
+        async function pushEntryToCloud(dateStr) {
+            if (!supabaseClient) {
+                localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
+                return;
+            }
+            const target = entries[dateStr];
+            await supabaseClient.from('diary_entries').upsert({
+                entry_date: dateStr,
+                text_content: target.text,
+                assets: target.canvasAssets
+            });
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
         function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); document.getElementById('diaryText').focus(); }
 
-        // --- SCRAPBOOK DRAG / ROTATE / RESIZE ENGINE ---
+        // --- CUTE BULLET LOGIC ---
+        function insertCuteBullet(emoji) {
+            document.getElementById('diaryText').focus();
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            
+            const range = selection.getRangeAt(0);
+            range.deleteContents();
+
+            const ul = document.createElement('ul');
+            const li = document.createElement('li');
+            li.setAttribute('data-emoji', emoji);
+            li.innerHTML = 'New list item...';
+            ul.appendChild(li);
+
+            range.insertNode(ul);
+            
+            // Reposition cursor nicely right inside the item text boundary
+            range.selectNodeContents(li);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        // --- SCRAPBOOK INTERACTION ENGINE ---
         function handleScrapbookImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Drop image centered near current viewport scroll area
-                const scrollOffset = document.getElementById('diaryText').scrollTop + 50;
-                spawnAsset('photo', e.target.result, 50, scrollOffset, 180, 0);
+                const scrollOffset = document.getElementById('diaryText').scrollTop + 40;
+                spawnAsset('photo', e.target.result, 30, scrollOffset, 150, 0);
             };
             reader.readAsDataURL(file);
             event.target.value = '';
         }
 
-        function spawnAsset(type, content, x = 40, y = 40, size = 160, rotation = 0) {
+        function spawnAsset(type, content, x = 30, y = 30, size = 150, rotation = 0) {
             if (!currentEntryId) return;
-            
-            // Adjust default sizing bounds based on asset type
-            if (type === 'sticker' && size === 160) size = 40; // Font size scale instead
+            if (type === 'sticker' && size === 150) size = 45;
 
-            const assetId = 'asset_' + Date.now() + Math.random().toString(36).substr(2, 5);
+            const assetId = 'asset_' + Date.now() + Math.random().toString(36).substr(2, 4);
             createFloatingAssetElement(assetId, type, content, x, y, size, rotation);
             
             if (!entries[currentEntryId].canvasAssets) entries[currentEntryId].canvasAssets = [];
             entries[currentEntryId].canvasAssets.push({ id: assetId, type: type, content: content, x: x, y: y, size: size, rotation: rotation });
-            saveToStorage();
+            pushEntryToCloud(currentEntryId);
         }
 
         function createFloatingAssetElement(id, type, content, x, y, size, rotation) {
             const assetEl = document.createElement('div');
             assetEl.id = id;
             assetEl.className = `scrapbook-asset ${type}-asset`;
-            assetEl.setAttribute('contenteditable', 'false'); // Stops text selection mixing
-            
-            // Layout setups
+            assetEl.setAttribute('contenteditable', 'false'); 
             assetEl.style.left = x + 'px';
             assetEl.style.top = y + 'px';
             
@@ -543,14 +667,12 @@
             }
             assetEl.appendChild(wrapper);
 
-            // Append control dots
             assetEl.innerHTML += `
                 <div class="control-handle handle-delete" onclick="removeAsset('${id}', event)">×</div>
                 <div class="control-handle handle-rotate">↻</div>
                 <div class="control-handle handle-resize">⤡</div>
             `;
 
-            // Core placement assignment: Append inside scrolling text body!
             document.getElementById('diaryText').appendChild(assetEl);
             applyAssetInteractions(assetEl, id, type);
             updateVisualTransform(assetEl, rotation);
@@ -565,6 +687,7 @@
             let isDragging = false, isResizing = false, isRotating = false;
             let startX, startY, startLeft, startTop, startSize, startAngle;
 
+            // Setup combined multi-platform Touch / Mouse monitors
             elmnt.addEventListener('mousedown', initDrag);
             elmnt.addEventListener('touchstart', initDrag, { passive: false });
 
@@ -583,14 +706,12 @@
                 return { x: e.clientX, y: e.clientY };
             }
 
-            // --- DRAG EVENT UTILITIES ---
             function initDrag(e) {
                 if (e.target.classList.contains('control-handle')) return;
                 e.preventDefault();
                 isDragging = true;
                 const coords = getEventCoords(e);
-                startX = coords.x;
-                startY = coords.y;
+                startX = coords.x; startY = coords.y;
                 startLeft = parseInt(elmnt.style.left) || 0;
                 startTop = parseInt(elmnt.style.top) || 0;
 
@@ -602,18 +723,13 @@
 
             function doDrag(e) {
                 if (!isDragging) return;
-                e.preventDefault();
                 const coords = getEventCoords(e);
-                const dx = coords.x - startX;
-                const dy = coords.y - startY;
-                elmnt.style.left = (startLeft + dx) + 'px';
-                elmnt.style.top = (startTop + dy) + 'px';
+                elmnt.style.left = (startLeft + (coords.x - startX)) + 'px';
+                elmnt.style.top = (startTop + (coords.y - startY)) + 'px';
             }
 
-            // --- RESIZE EVENT UTILITIES ---
             function initResize(e) {
-                e.preventDefault();
-                e.stopPropagation();
+                e.preventDefault(); e.stopPropagation();
                 isResizing = true;
                 const coords = getEventCoords(e);
                 startX = coords.x;
@@ -627,11 +743,8 @@
 
             function doResize(e) {
                 if (!isResizing) return;
-                e.preventDefault();
                 const coords = getEventCoords(e);
-                const dx = coords.x - startX;
-                let newSize = Math.max(20, startSize + dx);
-
+                let newSize = Math.max(20, startSize + (coords.x - startX));
                 if (type === 'sticker') {
                     elmnt.querySelector('.asset-wrapper').style.fontSize = newSize + 'px';
                 } else {
@@ -639,10 +752,8 @@
                 }
             }
 
-            // --- ROTATE EVENT UTILITIES ---
             function initRotate(e) {
-                e.preventDefault();
-                e.stopPropagation();
+                e.preventDefault(); e.stopPropagation();
                 isRotating = true;
                 const coords = getEventCoords(e);
                 const rect = elmnt.getBoundingClientRect();
@@ -650,15 +761,13 @@
                 const centerY = rect.top + rect.height / 2;
                 
                 startAngle = Math.atan2(coords.y - centerY, coords.x - centerX) * (180 / Math.PI);
-                currentRotation = parseFloat(elmnt.getAttribute('data-rotation')) || 0;
+                let currentRotation = parseFloat(elmnt.getAttribute('data-rotation')) || 0;
 
                 function doRotate(ev) {
                     if (!isRotating) return;
-                    ev.preventDefault();
                     const moveCoords = getEventCoords(ev);
                     const moveAngle = Math.atan2(moveCoords.y - centerY, moveCoords.x - centerX) * (180 / Math.PI);
-                    let targetRotation = currentRotation + (moveAngle - startAngle);
-                    updateVisualTransform(elmnt, targetRotation);
+                    updateVisualTransform(elmnt, currentRotation + (moveAngle - startAngle));
                 }
 
                 document.addEventListener('mousemove', doRotate);
@@ -674,7 +783,6 @@
                 document.removeEventListener('touchmove', doResize);
                 isDragging = false; isResizing = false; isRotating = false;
                 
-                // Keep dimensions synchronized into memory state model
                 if (currentEntryId && entries[currentEntryId].canvasAssets) {
                     const match = entries[currentEntryId].canvasAssets.find(a => a.id === id);
                     if (match) {
@@ -682,7 +790,7 @@
                         match.y = parseInt(elmnt.style.top);
                         match.rotation = parseFloat(elmnt.getAttribute('data-rotation')) || 0;
                         match.size = type === 'sticker' ? parseFloat(elmnt.querySelector('.asset-wrapper').style.fontSize) : parseInt(elmnt.style.width);
-                        saveToStorage();
+                        pushEntryToCloud(currentEntryId);
                     }
                 }
             }
@@ -695,15 +803,13 @@
             
             if (currentEntryId && entries[currentEntryId].canvasAssets) {
                 entries[currentEntryId].canvasAssets = entries[currentEntryId].canvasAssets.filter(a => a.id !== id);
-                saveToStorage();
+                pushEntryToCloud(currentEntryId);
             }
         }
 
-        function clearAllFloatingAssets() {
-            document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
-        }
+        function clearAllFloatingAssets() { document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove()); }
 
-        // --- DIARY UTILITIES ENGINE ---
+        // --- GENERAL ENTRY ACTIONS ---
         function renderEntryList() {
             const listContainer = document.getElementById('entryList');
             const searchQuery = document.getElementById('search').value.toLowerCase();
@@ -742,7 +848,7 @@
                 return;
             }
             entries[dateStr] = { text: "", canvasAssets: [] };
-            saveToStorage();
+            pushEntryToCloud(dateStr);
             loadEntry(dateStr);
             if(window.innerWidth <= 850) toggleSidebar();
         }
@@ -761,7 +867,6 @@
             document.getElementById('saveBtn').style.display = 'block';
             document.getElementById('deleteBtn').style.display = 'block';
 
-            // Respawn customized configurations
             if (entries[dateStr].canvasAssets) {
                 entries[dateStr].canvasAssets.forEach(a => {
                     createFloatingAssetElement(a.id, a.type, a.content, a.x, a.y, a.size, a.rotation);
@@ -772,12 +877,11 @@
 
         function saveCurrentEntry() {
             if (!currentEntryId) return;
-            // Clean control handle fragments before reading internal HTML states safely
             const textCleaner = document.getElementById('diaryText').cloneNode(true);
             textCleaner.querySelectorAll('.control-handle').forEach(h => h.remove());
             
             entries[currentEntryId].text = document.getElementById('diaryText').innerHTML;
-            saveToStorage();
+            pushEntryToCloud(currentEntryId);
             renderEntryList();
             
             const saveBtn = document.getElementById('saveBtn');
@@ -785,29 +889,31 @@
             setTimeout(() => saveBtn.innerText = "Save", 1500);
         }
 
-        function deleteCurrentEntry() {
+        async function deleteCurrentEntry() {
             if (!currentEntryId) return;
-            if (confirm("Delete this diary page?")) {
+            if (confirm("Delete this entry entirely?")) {
                 clearAllFloatingAssets();
+                if (supabaseClient) {
+                    await supabaseClient.from('diary_entries').delete().eq('entry_date', currentEntryId);
+                }
                 delete entries[currentEntryId];
-                saveToStorage();
+                localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
                 currentEntryId = null;
                 document.getElementById('diaryText').innerHTML = '';
                 document.getElementById('displayDate').innerText = 'Select or Create an Entry';
                 document.getElementById('editorContainer').style.display = 'none';
-                document.getElementById('saveBtn').style.none = 'none';
-                document.getElementById('deleteBtn').style.none = 'none';
+                document.getElementById('saveBtn').style.display = 'none';
+                document.getElementById('deleteBtn').style.display = 'none';
                 renderEntryList();
             }
         }
 
-        function saveToStorage() { localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries)); }
         function exportBackup() {
             if (Object.keys(entries).length === 0) return alert("Journal is empty!");
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(entries, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `diary_backup_${new Date().toISOString().split('T')[0]}.json`);
+            downloadAnchor.setAttribute("download", `diary_sync_backup.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
