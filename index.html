@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Private Garden of Thoughts</title>
+    <style>
+        :root {
+            --bg-main: #fff5f6;
+            --bg-sidebar: #ffe3e8;
+            --bg-card: #ffffff; 
+            --border: #f7b1bd;
+            --text-main: #4a282d;
+            --text-muted: #8c6066;
+            --accent: #ff8fa3;
+            --accent-hover: #ff758f;
+            --danger: #e56b6f;
+            --floral-pattern: url('https://www.transparenttextures.com/patterns/floral-paper.png');
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-main);
+            background-image: var(--floral-pattern);
+            color: var(--text-main);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Password Lock Screen Screen --- */
+        #lockScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-main);
+            background-image: var(--floral-pattern);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .lock-container {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(247, 177, 189, 0.3);
+        }
+
+        .lock-container h1 {
+            font-size: 1.6rem;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .lock-container p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .password-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 143, 163, 0.2);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+            min-height: 20px;
+            font-style: italic;
+        }
+
+        /* --- Sidebar Styling --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-sidebar);
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            height: 100%;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .sidebar h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            font-style: italic;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .entry-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .entry-item {
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .entry-item.active {
+            border-color: var(--accent-hover);
+            background: #fff9fa;
+        }
+
+        .entry-item .date {
+            font-size: 0.8rem;
+            color: var(--accent-hover);
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .entry-item .preview {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- Main Workspace Styling --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+        }
+
+        .left-toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .current-date {
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--text-main);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button, .toggle-sidebar-btn {
+            padding: 0.7rem 1.2rem;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            color: var(--danger);
+        }
+
+        .toggle-sidebar-btn {
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        /* --- Text Editor Area --- */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(247, 177, 189, 0.15);
+        }
+
+        .editor-tools {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tool-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.4rem 0.9rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            min-height: 35px;
+        }
+
+        .workspace-split {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .textarea-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            resize: none;
+            outline: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* --- Gallery Section --- */
+        .gallery-sidebar {
+            width: 200px;
+            background: #fffdfd;
+            border-left: 1px dashed var(--border);
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .gallery-sidebar h4 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+            font-style: italic;
+        }
+
+        .inserted-photo-wrapper {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .inserted-photo-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .delete-photo-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(255,255,255,0.9);
+            color: var(--danger);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 850px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%);
+                box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .workspace-split {
+                flex-direction: column;
+            }
+            .gallery-sidebar {
+                width: 100%;
+                height: 140px;
+                border-left: none;
+                border-top: 1px dashed var(--border);
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+            }
+            .inserted-photo-wrapper {
+                width: 100px;
+                flex-shrink: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lockScreen">
+        <div class="lock-container">
+            <h1>Secret Garden 🔐</h1>
+            <p>This diary is locked. Enter password to view entries.</p>
+            <input type="password" id="passwordField" class="password-input" placeholder="••••••" maxlength="6" autofocus onkeydown="if(event.key === 'Enter') checkPassword()">
+            <div id="errMessage" class="error-message"></div>
+            <button class="btn-primary" style="width: 100%;" onclick="checkPassword()">Unlock Entry</button>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <h2>My Blooming Thoughts 🌸</h2>
+        <button class="btn-primary" style="margin-bottom: 1rem;" onclick="createNewEntry()">+ New Entry</button>
+        <input type="text" class="search-box" id="search" placeholder="Search memories..." oninput="renderEntryList()">
+        <div class="entry-list" id="entryList"></div>
+        <button class="btn-secondary" onclick="exportBackup()">📥 Download Backup</button>
+    </div>
+
+    <div class="main-content">
+        <div class="toolbar">
+            <div class="left-toolbar-group">
+                <button class="toggle-sidebar-btn" onclick="toggleSidebar()">📖 Journal</button>
+                <div class="current-date" id="displayDate">Select or Create an Entry</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-danger" id="deleteBtn" onclick="deleteCurrentEntry()" style="display: none;">Delete</button>
+                <button class="btn-primary" id="saveBtn" onclick="saveCurrentEntry()" style="display: none;">Save</button>
+            </div>
+        </div>
+
+        <div class="editor-container" id="editorContainer" style="display: none;">
+            <div class="editor-tools">
+                <button class="tool-btn" style="font-weight: bold;" onclick="insertText('**', '**')">B</button>
+                <button class="tool-btn" style="font-style: italic;" onclick="insertText('*', '*')">I</button>
+                <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🌸 Add Photo</button>
+                <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+            </div>
+            
+            <div class="workspace-split">
+                <textarea class="textarea-input" id="diaryText" placeholder="Pour your thoughts onto the page..."></textarea>
+                <div class="gallery-sidebar">
+                    <h4>Photos 📸</h4>
+                    <div id="attachedPhotosContainer" style="display: flex; gap: 0.5rem; flex-wrap: inherit; flex-direction: inherit;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = JSON.parse(localStorage.getItem('private_floral_diary_entries')) || {};
+        let currentEntryId = null;
+
+        // Password matching function
+        function checkPassword() {
+            const entered = document.getElementById('passwordField').value;
+            const targetPassword = "###USER_SUPPLIED_PASSWORD###"; // Will read 200600 below
+            
+            if (entered === "200600") {
+                const lockScreen = document.getElementById('lockScreen');
+                lockScreen.style.opacity = '0';
+                setTimeout(() => {
+                    lockScreen.style.visibility = 'hidden';
+                }, 500);
+                
+                // Initialize workspace after proper verification
+                renderEntryList();
+                const todayStr = new Date().toISOString().split('T')[0];
+                if (entries[todayStr]) {
+                    loadEntry(todayStr);
+                }
+            } else {
+                document.getElementById('errMessage').innerText = "Incorrect secret key. Please try again... 💕";
+                document.getElementById('passwordField').value = '';
+                document.getElementById('passwordField').focus();
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function renderEntryList() {
+            const listContainer = document.getElementById('entryList');
+            const searchQuery = document.getElementById('search').value.toLowerCase();
+            listContainer.innerHTML = '';
+
+            const sortedDates = Object.keys(entries).sort((a, b) => new Date(b) - new Date(a));
+
+            sortedDates.forEach(date => {
+                const entryData = entries[date];
+                const textContent = entryData.text || '';
+                
+                if (textContent.toLowerCase().includes(searchQuery)) {
+                    const item = document.createElement('div');
+                    item.className = `entry-item ${date === currentEntryId ? 'active' : ''}`;
+                    item.onclick = () => {
+                        loadEntry(date);
+                        if(window.innerWidth <= 850) toggleSidebar();
+                    };
+
+                    const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+                    });
+
+                    const photoCount = entryData.images ? entryData.images.length : 0;
+                    const attachmentText = photoCount > 0 ? ` [📷 ${photoCount}]` : '';
+
+                    item.innerHTML = `
+                        <div class="date">${formattedDate}</div>
+                        <div class="preview">${textContent || 'An empty page awaiting words...'} <span style="color:var(--accent-hover);">${attachmentText}</span></div>
+                    `;
+                    listContainer.appendChild(item);
+                }
+            });
+        }
+
+        function createNewEntry() {
+            const dateStr = new Date().toISOString().split('T')[0];
+            
+            if (entries[dateStr] !== undefined) {
+                alert("An entry for today already exists!");
+                loadEntry(dateStr);
+                if(window.innerWidth <= 850) toggleSidebar();
+                return;
+            }
+
+            entries[dateStr] = { text: "", images: [] };
+            saveToStorage();
+            loadEntry(dateStr);
+            if(window.innerWidth <= 850) toggleSidebar();
+        }
+
+        function loadEntry(dateStr) {
+            currentEntryId = dateStr;
+            
+            const formattedDate = new Date(dateStr).toLocaleDateString('en-US', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            document.getElementById('displayDate').innerText = formattedDate;
+            document.getElementById('diaryText').value = entries[dateStr].text || '';
+            
+            document.getElementById('editorContainer').style.display = 'flex';
+            document.getElementById('saveBtn').style.display = 'block';
+            document.getElementById('deleteBtn').style.display = 'block';
+
+            renderPhotos();
+            renderEntryList();
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) { 
+                alert("To prevent your storage from filling up, please choose photos under 2MB.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                if (!entries[currentEntryId].images) {
+                    entries[currentEntryId].images = [];
+                }
+                entries[currentEntryId].images.push(base64Image);
+                saveCurrentEntry();
+                renderPhotos();
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function renderPhotos() {
+            const container = document.getElementById('attachedPhotosContainer');
+            container.innerHTML = '';
+            
+            if (!currentEntryId || !entries[currentEntryId].images) return;
+
+            entries[currentEntryId].images.forEach((imgSrc, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'inserted-photo-wrapper';
+                
+                wrapper.innerHTML = `
+                    <img src="${imgSrc}" alt="Attachment">
+                    <button class="delete-photo-btn" onclick="deletePhoto(${index})">×</button>
+                `;
+                container.appendChild(wrapper);
+            });
+        }
+
+        function deletePhoto(index) {
+            if (confirm("Remove this picture?")) {
+                entries[currentEntryId].images.splice(index, 1);
+                saveCurrentEntry();
+                renderPhotos();
+            }
+        }
+
+        function saveCurrentEntry() {
+            if (!currentEntryId) return;
+            
+            entries[currentEntryId].text = document.getElementById('diaryText').value;
+            saveToStorage();
+            renderEntryList();
+            
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerText = "Saved! 🌸";
+            setTimeout(() => { saveBtn.innerText = "Save"; }, 1500);
+        }
+
+        // Delete currently opened entry
+        function deleteCurrentEntry() {
+            if (!currentEntryId) return;
+            
+            if (confirm("Are you sure you want to delete this memory?")) {
+                delete entries[currentEntryId];
+                saveToStorage();
+                
+                currentEntryId = null;
+                document.getElementById('diaryText').value = '';
+                document.getElementById('displayDate').innerText = 'Select or Create an Entry';
+                document.getElementById('editorContainer').style.display = 'none';
+                document.getElementById('saveBtn').style.display = 'none';
+                document.getElementById('deleteBtn').style.display = 'none';
+                
+                renderPhotos();
+                renderEntryList();
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
+        }
+
+        function insertText(before, after) {
+            const textarea = document.getElementById('diaryText');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            const selectedText = text.substring(start, end);
+            const replacement = before + selectedText + after;
+            
+            textarea.value = text.substring(0, start) + replacement + text.substring(end, text.length);
+            textarea.focus();
+            textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+        }
+
+        function exportBackup() {
+            if (Object.keys(entries).length === 0) {
+                alert("Your journal is empty!");
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(entries, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `my_diary_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+    </script>
+</body>
+</html>
