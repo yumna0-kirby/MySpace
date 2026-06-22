@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Private Garden of Thoughts</title>
+    <!-- Include Supabase for Real-Time Cross-Device Syncing -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -423,6 +424,7 @@
 </head>
 <body>
 
+    <!-- PAGE 1: CLOUD SETUP VIEW (Only shows if keys are missing) -->
     <div id="setupPage" class="fullscreen-overlay" style="display: none;">
         <div class="lock-container">
             <h1>Cloud Link ☁️</h1>
@@ -436,6 +438,7 @@
         </div>
     </div>
 
+    <!-- PAGE 2: DIARY PASSCODE LOCK -->
     <div id="lockScreen" class="fullscreen-overlay" style="display: none;">
         <div class="lock-container">
             <h1>Secret Garden 🔐</h1>
@@ -450,6 +453,7 @@
         </div>
     </div>
 
+    <!-- Sidebar Component -->
     <div class="sidebar" id="sidebar">
         <h2>My Blooming Thoughts 🌸</h2>
         <button class="btn-primary" style="margin-bottom: 1rem;" onclick="createNewEntry()">+ New Entry</button>
@@ -458,6 +462,7 @@
         <button class="btn-secondary" onclick="exportBackup()">📥 Download Backup</button>
     </div>
 
+    <!-- Main Workspace -->
     <div class="main-content" id="mainWorkspace">
         <div class="toolbar">
             <div class="left-toolbar-group">
@@ -471,6 +476,7 @@
         </div>
 
         <div class="editor-container" id="editorContainer" style="display: none;">
+            <!-- Format Tools Bar -->
             <div class="editor-tools">
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
@@ -540,7 +546,6 @@
                 document.getElementById('setupPage').style.display = 'flex';
             } else {
                 document.getElementById('lockScreen').style.display = 'flex';
-                // Silently prepare the client in background
                 supabaseClient = supabase.createClient(savedUrl, savedKey);
             }
         });
@@ -558,7 +563,6 @@
             localStorage.setItem('sb_key', key);
             supabaseClient = supabase.createClient(url, key);
 
-            // Shift directly to password lock validation page
             document.getElementById('setupPage').style.display = 'none';
             document.getElementById('lockScreen').style.display = 'flex';
         }
@@ -578,7 +582,6 @@
                 return;
             }
 
-            // Successfully validated passcode, pull database data instantly
             if (supabaseClient) {
                 try {
                     await pullDataFromCloud();
@@ -590,14 +593,17 @@
                 loadLocalFallback();
             }
 
-            // Animate lock overlay transition off-screen
             const lockScreen = document.getElementById('lockScreen');
             lockScreen.style.opacity = '0';
             setTimeout(() => lockScreen.style.visibility = 'hidden', 500);
             
             renderEntryList();
-            const todayStr = new Date().toISOString().split('T')[0];
-            if (entries[todayStr]) loadEntry(todayStr);
+            
+            // Auto-load most recent entry if any exist
+            const sortedDates = Object.keys(entries).sort((a, b) => b.localeCompare(a));
+            if (sortedDates.length > 0) {
+                loadEntry(sortedDates[0]);
+            }
         }
 
         function loadLocalFallback() {
@@ -610,24 +616,27 @@
             if (!error && data) {
                 entries = {};
                 data.forEach(row => {
+                    // row.entry_date acts as a unique ID string now (contains dynamic timestamp strings)
                     entries[row.entry_date] = {
                         text: row.text_content,
+                        display_date: row.display_date || row.entry_date.split('_')[0],
                         canvasAssets: typeof row.assets === 'string' ? JSON.parse(row.assets) : row.assets || []
                     };
                 });
             }
         }
 
-        async function pushEntryToCloud(dateStr) {
+        async function pushEntryToCloud(idStr) {
             if (!supabaseClient) {
                 localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
                 return;
             }
-            const target = entries[dateStr];
+            const target = entries[idStr];
             await supabaseClient.from('diary_entries').upsert({
-                entry_date: dateStr,
+                entry_date: idStr,
                 text_content: target.text,
-                assets: target.canvasAssets
+                assets: target.canvasAssets,
+                display_date: target.display_date
             });
         }
 
@@ -847,24 +856,29 @@
             const searchQuery = document.getElementById('search').value.toLowerCase();
             listContainer.innerHTML = '';
 
-            const sortedDates = Object.keys(entries).sort((a, b) => new Date(b) - new Date(a));
-            sortedDates.forEach(date => {
-                const entryData = entries[date];
+            // Sort newest entries completely to the top
+            const sortedIds = Object.keys(entries).sort((a, b) => b.localeCompare(a));
+            sortedIds.forEach(id => {
+                const entryData = entries[id];
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = entryData.text || '';
                 const textContent = tempDiv.innerText || tempDiv.textContent || '';
                 
                 if (textContent.toLowerCase().includes(searchQuery)) {
                     const item = document.createElement('div');
-                    item.className = `entry-item ${date === currentEntryId ? 'active' : ''}`;
-                    item.onclick = () => { loadEntry(date); if(window.innerWidth <= 850) toggleSidebar(); };
+                    item.className = `entry-item ${id === currentEntryId ? 'active' : ''}`;
+                    item.onclick = () => { loadEntry(id); if(window.innerWidth <= 850) toggleSidebar(); };
 
-                    const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    const dateObject = new Date(entryData.display_date);
+                    const formattedDate = dateObject.toLocaleDateString('en-US', {
                         weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
                     });
 
+                    // Add a tiny time indicator if there are multiple entries on the same day
+                    const timeLabel = id.includes('_') ? ' ✨' : '';
+
                     item.innerHTML = `
-                        <div class="date">${formattedDate}</div>
+                        <div class="date">${formattedDate}${timeLabel}</div>
                         <div class="preview">${textContent.trim() || 'Empty page...'}</div>
                     `;
                     listContainer.appendChild(item);
@@ -873,34 +887,46 @@
         }
 
         function createNewEntry() {
-            const dateStr = new Date().toISOString().split('T')[0];
-            if (entries[dateStr] !== undefined) {
-                loadEntry(dateStr);
-                if(window.innerWidth <= 850) toggleSidebar();
-                return;
-            }
-            entries[dateStr] = { text: "", canvasAssets: [] };
-            pushEntryToCloud(dateStr);
-            loadEntry(dateStr);
+            // Generates an explicit 2026-06-23 date string regardless of hardware timezone offset
+            const localDate = new Date();
+            const year = localDate.getFullYear();
+            const month = String(localDate.getMonth() + 1).padStart(2, '0');
+            const day = String(localDate.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            
+            // Build a totally unique system unique ID using time millisecond stamp
+            const uniqueId = dateStr + '_' + Date.now();
+
+            entries[uniqueId] = { 
+                text: "", 
+                display_date: dateStr, 
+                canvasAssets: [] 
+            };
+            
+            pushEntryToCloud(uniqueId);
+            loadEntry(uniqueId);
             if(window.innerWidth <= 850) toggleSidebar();
         }
 
-        function loadEntry(dateStr) {
+        function loadEntry(idStr) {
             clearAllFloatingAssets();
-            currentEntryId = dateStr;
-            const formattedDate = new Date(dateStr).toLocaleDateString('en-US', {
+            currentEntryId = idStr;
+            
+            const baseDate = entries[idStr].display_date;
+            const dateObject = new Date(baseDate);
+            const formattedDate = dateObject.toLocaleDateString('en-US', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
 
             document.getElementById('displayDate').innerText = formattedDate;
-            document.getElementById('diaryText').innerHTML = entries[dateStr].text || '';
+            document.getElementById('diaryText').innerHTML = entries[idStr].text || '';
             
             document.getElementById('editorContainer').style.display = 'flex';
             document.getElementById('saveBtn').style.display = 'block';
             document.getElementById('deleteBtn').style.display = 'block';
 
-            if (entries[dateStr].canvasAssets) {
-                entries[dateStr].canvasAssets.forEach(a => {
+            if (entries[idStr].canvasAssets) {
+                entries[idStr].canvasAssets.forEach(a => {
                     createFloatingAssetElement(a.id, a.type, a.content, a.x, a.y, a.size, a.rotation);
                 });
             }
