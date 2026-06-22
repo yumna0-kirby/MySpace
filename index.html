@@ -15,6 +15,9 @@
             --accent: #ff8fa3;
             --accent-hover: #ff758f;
             --danger: #e56b6f;
+            --hl-yellow: #fff3b0;
+            --hl-pink: #ffccd5;
+            --hl-green: #c7f9cc;
             --floral-pattern: url('https://www.transparenttextures.com/patterns/floral-paper.png');
         }
 
@@ -22,7 +25,6 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Georgia', serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -34,9 +36,10 @@
             color: var(--text-main);
             overflow: hidden;
             position: relative;
+            font-family: 'Georgia', serif;
         }
 
-        /* --- Password Lock Screen Screen --- */
+        /* --- Password Lock Screen --- */
         #lockScreen {
             position: fixed;
             top: 0;
@@ -67,13 +70,6 @@
             font-size: 1.6rem;
             font-style: italic;
             margin-bottom: 0.5rem;
-            color: var(--text-main);
-        }
-
-        .lock-container p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 2rem;
         }
 
         .password-input {
@@ -90,17 +86,10 @@
             margin-bottom: 1.5rem;
         }
 
-        .password-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(255, 143, 163, 0.2);
-        }
-
         .error-message {
             color: var(--danger);
             font-size: 0.9rem;
-            margin-top: -1rem;
             margin-bottom: 1rem;
-            min-height: 20px;
             font-style: italic;
         }
 
@@ -135,14 +124,12 @@
             color: var(--text-main);
             margin-bottom: 1rem;
             outline: none;
-            font-size: 1rem;
         }
 
         .entry-list {
             flex: 1;
             overflow-y: auto;
             margin-bottom: 1rem;
-            -webkit-overflow-scrolling: touch;
         }
 
         .entry-item {
@@ -163,7 +150,6 @@
             font-size: 0.8rem;
             color: var(--accent-hover);
             font-weight: bold;
-            margin-bottom: 0.25rem;
         }
 
         .entry-item .preview {
@@ -174,7 +160,7 @@
             text-overflow: ellipsis;
         }
 
-        /* --- Main Workspace Styling --- */
+        /* --- Main Workspace --- */
         .main-content {
             flex: 1;
             display: flex;
@@ -190,7 +176,6 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
-            gap: 0.5rem;
         }
 
         .left-toolbar-group {
@@ -202,7 +187,6 @@
         .current-date {
             font-size: 1.3rem;
             font-style: italic;
-            color: var(--text-main);
         }
 
         .btn-group {
@@ -223,29 +207,12 @@
             min-height: 44px;
         }
 
-        .btn-primary {
-            background-color: var(--accent);
-            color: white;
-        }
+        .btn-primary { background-color: var(--accent); color: white; }
+        .btn-secondary { background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-danger { background-color: transparent; color: var(--danger); }
+        .toggle-sidebar-btn { background-color: var(--bg-sidebar); border: 1px solid var(--border); color: var(--text-main); }
 
-        .btn-secondary {
-            background-color: var(--bg-card);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
-
-        .btn-danger {
-            background-color: transparent;
-            color: var(--danger);
-        }
-
-        .toggle-sidebar-btn {
-            background-color: var(--bg-sidebar);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-        }
-
-        /* --- Text Editor Area --- */
+        /* --- Text Editor Container --- */
         .editor-container {
             flex: 1;
             display: flex;
@@ -265,14 +232,27 @@
             background: var(--bg-sidebar);
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
+            flex-wrap: wrap;
         }
 
         .tool-btn {
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 0.4rem 0.9rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 12px;
+            font-size: 0.9rem;
+            min-height: 35px;
+            cursor: pointer;
+        }
+
+        .tool-select {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.4rem;
+            border-radius: 12px;
+            outline: none;
             font-size: 0.9rem;
             min-height: 35px;
         }
@@ -283,7 +263,8 @@
             overflow: hidden;
         }
 
-        .textarea-input {
+        /* ContentEditable Box for Rich Styling */
+        .editor-input {
             flex: 1;
             background: transparent;
             border: none;
@@ -291,30 +272,63 @@
             padding: 1.5rem;
             font-size: 1.2rem;
             line-height: 1.7;
-            resize: none;
             outline: none;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* --- Gallery Section --- */
-        .gallery-sidebar {
-            width: 200px;
+        .editor-input[placeholder]:empty:before {
+            content: attr(placeholder);
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Scrapbook Side Panel (Photos & Stickers) */
+        .scrapbook-sidebar {
+            width: 220px;
             background: #fffdfd;
             border-left: 1px dashed var(--border);
             padding: 1rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            -webkit-overflow-scrolling: touch;
+            gap: 1.2rem;
         }
 
-        .gallery-sidebar h4 {
+        .scrapbook-sidebar h4 {
             font-size: 0.9rem;
             color: var(--text-muted);
             text-align: center;
             font-style: italic;
+            border-bottom: 1px dotted var(--border);
+            padding-bottom: 0.2rem;
+        }
+
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            justify-items: center;
+        }
+
+        .sticker-item {
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            user-select: none;
+        }
+
+        .sticker-item:hover {
+            transform: scale(1.3 /* Zoom sticker preview slightly on click hover */);
+        }
+
+        /* Inline embedded assets layouts */
+        .embedded-sticker {
+            display: inline-block;
+            font-size: 2rem;
+            vertical-align: middle;
+            margin: 0 0.25rem;
+            user-select: none;
         }
 
         .inserted-photo-wrapper {
@@ -322,11 +336,11 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid var(--border);
+            margin-bottom: 0.5rem;
         }
 
         .inserted-photo-wrapper img {
             width: 100%;
-            height: auto;
             display: block;
         }
 
@@ -340,63 +354,34 @@
             border-radius: 50%;
             width: 24px;
             height: 24px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-weight: bold;
+            cursor: pointer;
         }
 
-        #imageInput {
-            display: none;
-        }
+        #imageInput { display: none; }
 
-        /* Responsive Breakpoints */
         @media (max-width: 850px) {
-            body {
-                flex-direction: column;
-            }
-            .sidebar {
-                position: absolute;
-                left: 0;
-                top: 0;
-                transform: translateX(-100%);
-                box-shadow: 5px 0 15px rgba(0,0,0,0.1);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .workspace-split {
-                flex-direction: column;
-            }
-            .gallery-sidebar {
-                width: 100%;
-                height: 140px;
-                border-left: none;
-                border-top: 1px dashed var(--border);
-                flex-direction: row;
-                overflow-x: auto;
-                overflow-y: hidden;
-            }
-            .inserted-photo-wrapper {
-                width: 100px;
-                flex-shrink: 0;
-            }
+            .sidebar { position: absolute; left: 0; top: 0; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .workspace-split { flex-direction: column; }
+            .scrapbook-sidebar { width: 100%; height: 160px; border-left: none; border-top: 1px dashed var(--border); flex-direction: row; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Lock Screen -->
     <div id="lockScreen">
         <div class="lock-container">
             <h1>Secret Garden 🔐</h1>
-            <p>This diary is locked. Enter password to view entries.</p>
+            <p>Enter password to unlock your notes...</p>
             <input type="password" id="passwordField" class="password-input" placeholder="••••••" maxlength="6" autofocus onkeydown="if(event.key === 'Enter') checkPassword()">
             <div id="errMessage" class="error-message"></div>
             <button class="btn-primary" style="width: 100%;" onclick="checkPassword()">Unlock Entry</button>
         </div>
     </div>
 
+    <!-- Sidebar Component -->
     <div class="sidebar" id="sidebar">
         <h2>My Blooming Thoughts 🌸</h2>
         <button class="btn-primary" style="margin-bottom: 1rem;" onclick="createNewEntry()">+ New Entry</button>
@@ -405,6 +390,7 @@
         <button class="btn-secondary" onclick="exportBackup()">📥 Download Backup</button>
     </div>
 
+    <!-- Workspace -->
     <div class="main-content">
         <div class="toolbar">
             <div class="left-toolbar-group">
@@ -418,18 +404,55 @@
         </div>
 
         <div class="editor-container" id="editorContainer" style="display: none;">
+            <!-- Extended Styling Toolbar -->
             <div class="editor-tools">
-                <button class="tool-btn" style="font-weight: bold;" onclick="insertText('**', '**')">B</button>
-                <button class="tool-btn" style="font-style: italic;" onclick="insertText('*', '*')">I</button>
-                <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🌸 Add Photo</button>
+                <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
+                <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
+                
+                <!-- Font Dropdown picker -->
+                <select class="tool-select" id="fontSelector" onchange="changeFont(this.value)">
+                    <option value="Georgia">Georgia (Classic)</option>
+                    <option value="'Courier New', monospace">Courier (Typewriter)</option>
+                    <option value="'Comic Sans MS', cursive">Comic Sans (Cute)</option>
+                    <option value="sans-serif">Arial (Clean)</option>
+                </select>
+
+                <!-- Highlight Selector -->
+                <select class="tool-select" id="highlightSelector" onchange="applyHighlight(this.value); this.value='';">
+                    <option value="">✨ Highlight</option>
+                    <option value="var(--hl-pink)">🌸 Pink Tint</option>
+                    <option value="var(--hl-yellow)">💛 Soft Yellow</option>
+                    <option value="var(--hl-green)">🌿 Soft Green</option>
+                    <option value="transparent">❌ Clear</option>
+                </select>
+
+                <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Photo</button>
                 <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
             </div>
             
             <div class="workspace-split">
-                <textarea class="textarea-input" id="diaryText" placeholder="Pour your thoughts onto the page..."></textarea>
-                <div class="gallery-sidebar">
-                    <h4>Photos 📸</h4>
-                    <div id="attachedPhotosContainer" style="display: flex; gap: 0.5rem; flex-wrap: inherit; flex-direction: inherit;"></div>
+                <!-- Rich Text Editable Block -->
+                <div class="editor-input" id="diaryText" contenteditable="true" placeholder="Pour your heart out here..."></div>
+                
+                <!-- Scrapbook Accessories Panel -->
+                <div class="scrapbook-sidebar">
+                    <div>
+                        <h4>Stickers ✨</h4>
+                        <div class="sticker-grid">
+                            <div class="sticker-item" onclick="insertSticker('🌸')">🌸</div>
+                            <div class="sticker-item" onclick="insertSticker('💖')">💖</div>
+                            <div class="sticker-item" onclick="insertSticker('🧸')">🧸</div>
+                            <div class="sticker-item" onclick="insertSticker('🎀')">🎀</div>
+                            <div class="sticker-item" onclick="insertSticker('🐱')">🐱</div>
+                            <div class="sticker-item" onclick="insertSticker('🍰')">🍰</div>
+                            <div class="sticker-item" onclick="insertSticker('☕')">☕</div>
+                            <div class="sticker-item" onclick="insertSticker('⭐')">⭐</div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Photos 📸</h4>
+                        <div id="attachedPhotosContainer"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -439,33 +462,41 @@
         let entries = JSON.parse(localStorage.getItem('private_floral_diary_entries')) || {};
         let currentEntryId = null;
 
-        // Password matching function
         function checkPassword() {
             const entered = document.getElementById('passwordField').value;
-            const targetPassword = "###USER_SUPPLIED_PASSWORD###"; // Will read 200600 below
-            
             if (entered === "200600") {
                 const lockScreen = document.getElementById('lockScreen');
                 lockScreen.style.opacity = '0';
-                setTimeout(() => {
-                    lockScreen.style.visibility = 'hidden';
-                }, 500);
-                
-                // Initialize workspace after proper verification
+                setTimeout(() => lockScreen.style.visibility = 'hidden', 500);
                 renderEntryList();
                 const todayStr = new Date().toISOString().split('T')[0];
-                if (entries[todayStr]) {
-                    loadEntry(todayStr);
-                }
+                if (entries[todayStr]) loadEntry(todayStr);
             } else {
-                document.getElementById('errMessage').innerText = "Incorrect secret key. Please try again... 💕";
+                document.getElementById('errMessage').innerText = "Incorrect secret key... 💕";
                 document.getElementById('passwordField').value = '';
-                document.getElementById('passwordField').focus();
             }
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+        function formatDoc(cmd, value = null) {
+            document.execCommand(cmd, false, value);
+            document.getElementById('diaryText').focus();
+        }
+
+        function changeFont(fontName) {
+            formatDoc('fontName', fontName);
+        }
+
+        function applyHighlight(color) {
+            if(color) formatDoc('hiliteColor', color);
+        }
+
+        // Drop animated/inline decorative elements directly inside cursor text area
+        function insertSticker(emoji) {
+            document.getElementById('diaryText').focus();
+            const stickerHtml = `<span class="embedded-sticker" contenteditable="false">${emoji}</span>&nbsp;`;
+            document.execCommand('insertHTML', false, stickerHtml);
         }
 
         function renderEntryList() {
@@ -477,15 +508,15 @@
 
             sortedDates.forEach(date => {
                 const entryData = entries[date];
-                const textContent = entryData.text || '';
+                // Strip HTML tags for clean raw summary preview text inside sidebar
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = entryData.text || '';
+                const textContent = tempDiv.innerText || tempDiv.textContent || '';
                 
                 if (textContent.toLowerCase().includes(searchQuery)) {
                     const item = document.createElement('div');
                     item.className = `entry-item ${date === currentEntryId ? 'active' : ''}`;
-                    item.onclick = () => {
-                        loadEntry(date);
-                        if(window.innerWidth <= 850) toggleSidebar();
-                    };
+                    item.onclick = () => { loadEntry(date); if(window.innerWidth <= 850) toggleSidebar(); };
 
                     const formattedDate = new Date(date).toLocaleDateString('en-US', {
                         weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
@@ -496,7 +527,7 @@
 
                     item.innerHTML = `
                         <div class="date">${formattedDate}</div>
-                        <div class="preview">${textContent || 'An empty page awaiting words...'} <span style="color:var(--accent-hover);">${attachmentText}</span></div>
+                        <div class="preview">${textContent.trim() || 'Empty canvas...'} <span style="color:var(--accent-hover);">${attachmentText}</span></div>
                     `;
                     listContainer.appendChild(item);
                 }
@@ -505,14 +536,11 @@
 
         function createNewEntry() {
             const dateStr = new Date().toISOString().split('T')[0];
-            
             if (entries[dateStr] !== undefined) {
-                alert("An entry for today already exists!");
                 loadEntry(dateStr);
                 if(window.innerWidth <= 850) toggleSidebar();
                 return;
             }
-
             entries[dateStr] = { text: "", images: [] };
             saveToStorage();
             loadEntry(dateStr);
@@ -521,13 +549,12 @@
 
         function loadEntry(dateStr) {
             currentEntryId = dateStr;
-            
             const formattedDate = new Date(dateStr).toLocaleDateString('en-US', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
 
             document.getElementById('displayDate').innerText = formattedDate;
-            document.getElementById('diaryText').value = entries[dateStr].text || '';
+            document.getElementById('diaryText').innerHTML = entries[dateStr].text || '';
             
             document.getElementById('editorContainer').style.display = 'flex';
             document.getElementById('saveBtn').style.display = 'block';
@@ -540,19 +567,14 @@
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            if (file.size > 2 * 1024 * 1024) { 
-                alert("To prevent your storage from filling up, please choose photos under 2MB.");
+            if (file.size > 1.5 * 1024 * 1024) { 
+                alert("Please compress photos under 1.5MB to save local memory room!");
                 return;
             }
-
             const reader = new FileReader();
             reader.onload = function(e) {
-                const base64Image = e.target.result;
-                if (!entries[currentEntryId].images) {
-                    entries[currentEntryId].images = [];
-                }
-                entries[currentEntryId].images.push(base64Image);
+                if (!entries[currentEntryId].images) entries[currentEntryId].images = [];
+                entries[currentEntryId].images.push(e.target.result);
                 saveCurrentEntry();
                 renderPhotos();
             };
@@ -563,13 +585,11 @@
         function renderPhotos() {
             const container = document.getElementById('attachedPhotosContainer');
             container.innerHTML = '';
-            
             if (!currentEntryId || !entries[currentEntryId].images) return;
 
             entries[currentEntryId].images.forEach((imgSrc, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'inserted-photo-wrapper';
-                
                 wrapper.innerHTML = `
                     <img src="${imgSrc}" alt="Attachment">
                     <button class="delete-photo-btn" onclick="deletePhoto(${index})">×</button>
@@ -579,7 +599,7 @@
         }
 
         function deletePhoto(index) {
-            if (confirm("Remove this picture?")) {
+            if (confirm("Remove picture?")) {
                 entries[currentEntryId].images.splice(index, 1);
                 saveCurrentEntry();
                 renderPhotos();
@@ -588,63 +608,38 @@
 
         function saveCurrentEntry() {
             if (!currentEntryId) return;
-            
-            entries[currentEntryId].text = document.getElementById('diaryText').value;
+            entries[currentEntryId].text = document.getElementById('diaryText').innerHTML;
             saveToStorage();
             renderEntryList();
             
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.innerText = "Saved! 🌸";
-            setTimeout(() => { saveBtn.innerText = "Save"; }, 1500);
+            setTimeout(() => saveBtn.innerText = "Save", 1500);
         }
 
-        // Delete currently opened entry
         function deleteCurrentEntry() {
             if (!currentEntryId) return;
-            
-            if (confirm("Are you sure you want to delete this memory?")) {
+            if (confirm("Delete this diary page?")) {
                 delete entries[currentEntryId];
                 saveToStorage();
-                
                 currentEntryId = null;
-                document.getElementById('diaryText').value = '';
+                document.getElementById('diaryText').innerHTML = '';
                 document.getElementById('displayDate').innerText = 'Select or Create an Entry';
                 document.getElementById('editorContainer').style.display = 'none';
                 document.getElementById('saveBtn').style.display = 'none';
                 document.getElementById('deleteBtn').style.display = 'none';
-                
                 renderPhotos();
                 renderEntryList();
             }
         }
 
-        function saveToStorage() {
-            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
-        }
-
-        function insertText(before, after) {
-            const textarea = document.getElementById('diaryText');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            
-            const selectedText = text.substring(start, end);
-            const replacement = before + selectedText + after;
-            
-            textarea.value = text.substring(0, start) + replacement + text.substring(end, text.length);
-            textarea.focus();
-            textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
-        }
-
+        function saveToStorage() { localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries)); }
         function exportBackup() {
-            if (Object.keys(entries).length === 0) {
-                alert("Your journal is empty!");
-                return;
-            }
+            if (Object.keys(entries).length === 0) return alert("Journal is empty!");
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(entries, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `my_diary_backup_${new Date().toISOString().split('T')[0]}.json`);
+            downloadAnchor.setAttribute("download", `diary_backup_${new Date().toISOString().split('T')[0]}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
