@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Private Garden of Thoughts</title>
-    <!-- Include Supabase for Real-Time Cross-Device Syncing -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -41,8 +40,8 @@
             font-family: 'Georgia', serif;
         }
 
-        /* --- Password Lock Screen --- */
-        #lockScreen {
+        /* --- Full Screen Overlays --- */
+        .fullscreen-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -54,7 +53,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
         .lock-container {
@@ -80,12 +78,6 @@
             text-align: center;
             outline: none;
             margin-bottom: 1rem;
-        }
-        
-        .sync-setup-group {
-            margin-bottom: 1rem;
-            border-bottom: 1px dashed var(--border);
-            padding-bottom: 1rem;
         }
         
         .error-message { color: var(--danger); font-size: 0.9rem; margin-bottom: 1rem; font-style: italic; }
@@ -431,27 +423,33 @@
 </head>
 <body>
 
-    <!-- Lock Screen Component -->
-    <div id="lockScreen">
+    <div id="setupPage" class="fullscreen-overlay" style="display: none;">
         <div class="lock-container">
-            <h1>Secret Garden 🔐</h1>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Enter your password to unlock</p>
+            <h1>Cloud Link ☁️</h1>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">Connect your database to sync across iPad, PC, and Phone.</p>
             
-            <!-- Credentials layout section -->
-            <div id="syncSetupContainer" class="sync-setup-group">
-                <input type="text" id="dbUrl" class="password-input" placeholder="Supabase URL">
-                <input type="password" id="dbAnonKey" class="password-input" placeholder="Supabase Anon Key">
-                <p style="font-size:0.75rem; color:var(--accent-hover); font-style:italic;">Cloud credentials will disappear once saved successfully!</p>
-            </div>
-
-            <input type="password" id="passwordField" class="password-input" placeholder="6-Digit Secret Key" maxlength="6" onkeydown="if(event.key === 'Enter') initializeAndUnlock()">
+            <input type="text" id="dbUrl" class="password-input" placeholder="Supabase URL">
+            <input type="password" id="dbAnonKey" class="password-input" placeholder="Supabase Anon Key">
             
-            <div id="errMessage" class="error-message"></div>
-            <button class="btn-primary" style="width: 100%;" onclick="initializeAndUnlock()">Unlock Entry</button>
+            <div id="setupErrMessage" class="error-message"></div>
+            <button class="btn-primary" style="width: 100%;" onclick="saveCloudCredentials()">Save & Continue</button>
         </div>
     </div>
 
-    <!-- Sidebar Component -->
+    <div id="lockScreen" class="fullscreen-overlay" style="display: none;">
+        <div class="lock-container">
+            <h1>Secret Garden 🔐</h1>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">Enter your passcode to open your diary</p>
+
+            <input type="password" id="passwordField" class="password-input" placeholder="6-Digit Secret Key" maxlength="6" onkeydown="if(event.key === 'Enter') unlockDiary()">
+            
+            <div id="errMessage" class="error-message"></div>
+            <button class="btn-primary" style="width: 100%;" onclick="unlockDiary()">Unlock Entry</button>
+            
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:1.5rem; cursor:pointer; text-decoration:underline;" onclick="resetCloudSetup()">Update Cloud Keys</p>
+        </div>
+    </div>
+
     <div class="sidebar" id="sidebar">
         <h2>My Blooming Thoughts 🌸</h2>
         <button class="btn-primary" style="margin-bottom: 1rem;" onclick="createNewEntry()">+ New Entry</button>
@@ -460,7 +458,6 @@
         <button class="btn-secondary" onclick="exportBackup()">📥 Download Backup</button>
     </div>
 
-    <!-- Main Workspace -->
     <div class="main-content" id="mainWorkspace">
         <div class="toolbar">
             <div class="left-toolbar-group">
@@ -474,7 +471,6 @@
         </div>
 
         <div class="editor-container" id="editorContainer" style="display: none;">
-            <!-- Format Tools Bar -->
             <div class="editor-tools">
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
@@ -535,46 +531,66 @@
         let entries = {};
         let currentEntryId = null;
 
-        // Immediately check device cache when the file page mounts
-        const savedUrl = localStorage.getItem('sb_url') || '';
-        const savedKey = localStorage.getItem('sb_key') || '';
+        // --- PAGE MANAGEMENT NAVIGATION ENGINE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUrl = localStorage.getItem('sb_url');
+            const savedKey = localStorage.getItem('sb_key');
 
-        if (savedUrl) document.getElementById('dbUrl').value = savedUrl;
-        if (savedKey) document.getElementById('dbAnonKey').value = savedKey;
+            if (!savedUrl || !savedKey) {
+                document.getElementById('setupPage').style.display = 'flex';
+            } else {
+                document.getElementById('lockScreen').style.display = 'flex';
+                // Silently prepare the client in background
+                supabaseClient = supabase.createClient(savedUrl, savedKey);
+            }
+        });
 
-        // Instantly toggle credential elements away if already present
-        if (savedUrl && savedKey) {
-            document.getElementById('syncSetupContainer').style.display = 'none';
-        }
-
-        async function initializeAndUnlock() {
+        function saveCloudCredentials() {
             const url = document.getElementById('dbUrl').value.trim();
             const key = document.getElementById('dbAnonKey').value.trim();
-            const password = document.getElementById('passwordField').value;
 
-            if (password !== "200600") {
-                document.getElementById('errMessage').innerText = "Incorrect secret key... 💕";
+            if (!url || !key) {
+                document.getElementById('setupErrMessage').innerText = "Please fill in both database fields! 💕";
                 return;
             }
 
-            // Save elements into local storage IMMEDIATELY before initializing
-            if (url && key) {
-                localStorage.setItem('sb_url', url);
-                localStorage.setItem('sb_key', key);
-                document.getElementById('syncSetupContainer').style.display = 'none';
-                
+            localStorage.setItem('sb_url', url);
+            localStorage.setItem('sb_key', key);
+            supabaseClient = supabase.createClient(url, key);
+
+            // Shift directly to password lock validation page
+            document.getElementById('setupPage').style.display = 'none';
+            document.getElementById('lockScreen').style.display = 'flex';
+        }
+
+        function resetCloudSetup() {
+            localStorage.removeItem('sb_url');
+            localStorage.removeItem('sb_key');
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('setupPage').style.display = 'flex';
+        }
+
+        async function unlockDiary() {
+            const password = document.getElementById('passwordField').value;
+
+            if (password !== "200600") {
+                document.getElementById('errMessage').innerText = "Incorrect passcode... 💕";
+                return;
+            }
+
+            // Successfully validated passcode, pull database data instantly
+            if (supabaseClient) {
                 try {
-                    supabaseClient = supabase.createClient(url, key);
                     await pullDataFromCloud();
                 } catch (err) {
-                    console.warn("Cloud client failure, reverting to device cache storage fallback.");
+                    console.warn("Cloud pull connection issue. Reverting to device storage cache.");
                     loadLocalFallback();
                 }
             } else {
                 loadLocalFallback();
             }
 
-            // Smooth UI Unlock presentation animation 
+            // Animate lock overlay transition off-screen
             const lockScreen = document.getElementById('lockScreen');
             lockScreen.style.opacity = '0';
             setTimeout(() => lockScreen.style.visibility = 'hidden', 500);
