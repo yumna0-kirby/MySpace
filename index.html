@@ -134,7 +134,7 @@
             text-overflow: ellipsis;
         }
 
-        /* --- Main Content --- */
+        /* --- Main Content Workspace --- */
         .main-content {
             flex: 1;
             display: flex;
@@ -205,7 +205,7 @@
             outline: none;
         }
 
-        /* Highlight Palette Styling */
+        /* Highlight Palette */
         .highlight-palette {
             display: flex;
             align-items: center;
@@ -216,14 +216,7 @@
             border: 1px solid var(--border);
             min-height: 35px;
         }
-
-        .highlight-palette span {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-style: italic;
-            margin-right: 0.2rem;
-        }
-
+        .highlight-palette span { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-right: 0.2rem; }
         .hl-dot {
             width: 22px;
             height: 22px;
@@ -234,7 +227,7 @@
         }
         .hl-dot:hover { transform: scale(1.2); }
 
-        .workspace-split { display: flex; flex: 1; overflow: hidden; }
+        .workspace-split { display: flex; flex: 1; overflow: hidden; position: relative; }
 
         .editor-input {
             flex: 1;
@@ -247,15 +240,7 @@
             outline: none;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-        }
-
-        .editor-input img {
-            max-width: 80%;
-            max-height: 300px;
-            border-radius: 12px;
-            border: 2px solid var(--border);
-            display: block;
-            margin: 1rem 0;
+            z-index: 1;
         }
 
         .editor-input[placeholder]:empty:before {
@@ -264,7 +249,7 @@
             font-style: italic;
         }
 
-        /* --- Sticker Drawer Section --- */
+        /* --- Sticker Side Drawer --- */
         .scrapbook-sidebar {
             width: 160px;
             background: #fffdfd;
@@ -274,6 +259,7 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            z-index: 10;
         }
 
         .scrapbook-sidebar h4 {
@@ -300,32 +286,57 @@
         }
         .tray-sticker:hover { transform: scale(1.15); }
 
-        /* --- Floating Placed Stickers --- */
-        .floating-sticker {
+        /* --- UNIFIED CANVAS DRAGGABLE ASSETS --- */
+        .scrapbook-asset {
             position: absolute;
-            font-size: 2.5rem;
             cursor: move;
             user-select: none;
-            z-index: 100;
+            z-index: 50;
             touch-action: none;
         }
-        .floating-sticker .delete-sticker-btn {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: rgba(255,255,255,0.9);
-            color: var(--danger);
+
+        .scrapbook-asset.sticker-asset {
+            font-size: 2.8rem;
+            line-height: 1;
+        }
+
+        .scrapbook-asset.photo-asset {
+            max-width: 220px;
+            background: white;
+            padding: 8px 8px 24px 8px;
             border: 1px solid var(--border);
+            box-shadow: 0 4px 10px rgba(247, 177, 189, 0.3);
+            border-radius: 4px;
+            transform: rotate(-2deg); /* Polarised look */
+        }
+
+        .scrapbook-asset.photo-asset img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 2px;
+            pointer-events: none; /* Passes control directly down to touch handler wrapper */
+        }
+
+        .delete-asset-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            border: none;
             border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            font-size: 0.6rem;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
             display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 60;
         }
-        .floating-sticker:hover .delete-sticker-btn { display: flex; }
+        .scrapbook-asset:hover .delete-asset-btn { display: flex; }
 
         #imageInput { display: none; }
 
@@ -392,26 +403,26 @@
                     </div>
                 </div>
 
-                <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Photo Inline</button>
-                <input type="file" id="imageInput" accept="image/*" onchange="handleInlineImageUpload(event)">
+                <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Floating Photo</button>
+                <input type="file" id="imageInput" accept="image/*" onchange="handleScrapbookImageUpload(event)">
             </div>
             
-            <div class="workspace-split">
+            <div class="workspace-split" id="canvasSplitContainer">
                 <div class="editor-input" id="diaryText" contenteditable="true" placeholder="Pour your heart out here..."></div>
                 
                 <div class="scrapbook-sidebar">
                     <h4>Stickers ✨</h4>
                     <div class="sticker-grid">
-                        <div class="tray-sticker" onclick="spawnSticker('🌸')">🌸</div>
-                        <div class="tray-sticker" onclick="spawnSticker('💖')">💖</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🎀')">🎀</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🧸')">🧸</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🐱')">🐱</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🧁')">🧁</div>
-                        <div class="tray-sticker" onclick="spawnSticker('⭐')">⭐</div>
-                        <div class="tray-sticker" onclick="shadowSpawn('☁️')">☁️</div>
-                        <div class="tray-sticker" onclick="spawnSticker('🎨')">🎨</div>
-                        <div class="tray-sticker" onclick="spawnSticker('💘')">💘</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🌸')">🌸</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '💖')">💖</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🎀')">🎀</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🧸')">🧸</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🐱')">🐱</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🧁')">🧁</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '⭐')">⭐</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '☁️')">☁️</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🎨')">🎨</div>
+                        <div class="tray-sticker" onclick="spawnAsset('sticker', '💘')">💘</div>
                     </div>
                 </div>
             </div>
@@ -438,68 +449,72 @@
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        
-        function formatDoc(cmd, value = null) { 
-            document.execCommand(cmd, false, value); 
-            document.getElementById('diaryText').focus(); 
-        }
+        function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); document.getElementById('diaryText').focus(); }
 
-        // --- INLINE IMAGE HANDLING ---
-        function handleInlineImageUpload(event) {
+        // --- UNIFIED DRAGGABLE CANVAS ASSETS ENGINE ---
+        function handleScrapbookImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             if (file.size > 2 * 1024 * 1024) { 
-                alert("Please select images under 2MB to ensure quick loading!");
+                alert("Please compress image files down under 2MB to keep performance fast!");
                 return;
             }
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('diaryText').focus();
-                const imgHtml = `<img src="${e.target.result}" alt="embedded image" /><br>`;
-                document.execCommand('insertHTML', false, imgHtml);
-                saveCurrentEntry();
+                spawnAsset('photo', e.target.result);
             };
             reader.readAsDataURL(file);
             event.target.value = '';
         }
 
-        // --- DRAG AND DROP STICKERS LOGIC ---
-        function spawnSticker(emoji, x = 150, y = 150) {
+        function spawnAsset(type, content, x = 120, y = 120) {
             if (!currentEntryId) return;
             
-            const stickerId = 'sticker_' + Date.now() + Math.random().toString(36).substr(2, 5);
-            createFloatingStickerElement(stickerId, emoji, x, y);
+            const assetId = 'asset_' + Date.now() + Math.random().toString(36).substr(2, 5);
+            createFloatingAssetElement(assetId, type, content, x, y);
             
-            if (!entries[currentEntryId].stickers) entries[currentEntryId].stickers = [];
-            entries[currentEntryId].stickers.push({ id: stickerId, emoji: emoji, x: x, y: y });
+            if (!entries[currentEntryId].canvasAssets) entries[currentEntryId].canvasAssets = [];
+            entries[currentEntryId].canvasAssets.push({ id: assetId, type: type, content: content, x: x, y: y });
             saveToStorage();
         }
 
-        function createFloatingStickerElement(id, emoji, x, y) {
-            const sticker = document.createElement('div');
-            sticker.className = 'floating-sticker';
-            sticker.id = id;
-            sticker.style.left = x + 'px';
-            sticker.style.top = y + 'px';
-            sticker.innerHTML = `${emoji}<div class="delete-sticker-btn" onclick="removeSticker('${id}', event)">×</div>`;
+        function createFloatingAssetElement(id, type, content, x, y) {
+            const assetEl = document.createElement('div');
+            assetEl.id = id;
+            assetEl.className = `scrapbook-asset ${type}-asset`;
+            assetEl.style.left = x + 'px';
+            assetEl.style.top = y + 'px';
+
+            if (type === 'sticker') {
+                assetEl.innerHTML = `${content}`;
+            } else if (type === 'photo') {
+                assetEl.innerHTML = `<img src="${content}" alt="Scrapbook Memory" />`;
+            }
+
+            // Create contextual cross button overlay
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-asset-btn';
+            deleteBtn.innerText = '×';
+            deleteBtn.onclick = (e) => removeAsset(id, e);
+            assetEl.appendChild(deleteBtn);
             
-            document.getElementById('mainWorkspace').appendChild(sticker);
-            makeElementDraggable(sticker);
+            document.getElementById('canvasSplitContainer').appendChild(assetEl);
+            makeElementDraggable(assetEl);
         }
 
-        function removeSticker(id, event) {
+        function removeAsset(id, event) {
             event.stopPropagation();
             const element = document.getElementById(id);
             if (element) element.remove();
             
-            if (currentEntryId && entries[currentEntryId].stickers) {
-                entries[currentEntryId].stickers = entries[currentEntryId].stickers.filter(s => s.id !== id);
+            if (currentEntryId && entries[currentEntryId].canvasAssets) {
+                entries[currentEntryId].canvasAssets = entries[currentEntryId].canvasAssets.filter(a => a.id !== id);
                 saveToStorage();
             }
         }
 
-        function clearAllFloatingStickers() {
-            document.querySelectorAll('.floating-sticker').forEach(el => el.remove());
+        function clearAllFloatingAssets() {
+            document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
         }
 
         function makeElementDraggable(elmnt) {
@@ -508,6 +523,7 @@
             elmnt.ontouchstart = dragTouchStart;
 
             function dragMouseDown(e) {
+                if (e.target.className === 'delete-asset-btn') return;
                 e.preventDefault();
                 pos3 = e.clientX;
                 pos4 = e.clientY;
@@ -516,6 +532,7 @@
             }
 
             function dragTouchStart(e) {
+                if (e.target.className === 'delete-asset-btn') return;
                 pos3 = e.touches[0].clientX;
                 pos4 = e.touches[0].clientY;
                 document.ontouchend = closeDragElement;
@@ -528,7 +545,7 @@
                 pos2 = pos4 - e.clientY;
                 pos3 = e.clientX;
                 pos4 = e.clientY;
-                updateStickerPosition(elmnt.offsetTop - pos2, elmnt.offsetLeft - pos1);
+                updatePosition(elmnt.offsetTop - pos2, elmnt.offsetLeft - pos1);
             }
 
             function elementTouchDrag(e) {
@@ -536,10 +553,10 @@
                 pos2 = pos4 - e.touches[0].clientY;
                 pos3 = e.touches[0].clientX;
                 pos4 = e.touches[0].clientY;
-                updateStickerPosition(elmnt.offsetTop - pos2, elmnt.offsetLeft - pos1);
+                updatePosition(elmnt.offsetTop - pos2, elmnt.offsetLeft - pos1);
             }
 
-            function updateStickerPosition(top, left) {
+            function updatePosition(top, left) {
                 elmnt.style.top = top + "px";
                 elmnt.style.left = left + "px";
             }
@@ -550,8 +567,8 @@
                 document.ontouchend = null;
                 document.ontouchmove = null;
                 
-                if (currentEntryId && entries[currentEntryId].stickers) {
-                    const match = entries[currentEntryId].stickers.find(s => s.id === elmnt.id);
+                if (currentEntryId && entries[currentEntryId].canvasAssets) {
+                    const match = entries[currentEntryId].canvasAssets.find(a => a.id === elmnt.id);
                     if (match) {
                         match.x = parseInt(elmnt.style.left);
                         match.y = parseInt(elmnt.style.top);
@@ -561,7 +578,7 @@
             }
         }
 
-        // --- DIARY ENGINE UTILITIES ---
+        // --- DIARY ENGINE BACKEND ---
         function renderEntryList() {
             const listContainer = document.getElementById('entryList');
             const searchQuery = document.getElementById('search').value.toLowerCase();
@@ -599,14 +616,14 @@
                 if(window.innerWidth <= 850) toggleSidebar();
                 return;
             }
-            entries[dateStr] = { text: "", stickers: [] };
+            entries[dateStr] = { text: "", canvasAssets: [] };
             saveToStorage();
             loadEntry(dateStr);
             if(window.innerWidth <= 850) toggleSidebar();
         }
 
         function loadEntry(dateStr) {
-            clearAllFloatingStickers();
+            clearAllFloatingAssets();
             currentEntryId = dateStr;
             const formattedDate = new Date(dateStr).toLocaleDateString('en-US', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -619,9 +636,10 @@
             document.getElementById('saveBtn').style.display = 'block';
             document.getElementById('deleteBtn').style.display = 'block';
 
-            if (entries[dateStr].stickers) {
-                entries[dateStr].stickers.forEach(s => {
-                    createFloatingStickerElement(s.id, s.emoji, s.x, s.y);
+            // Respawn all layered items for this entry
+            if (entries[dateStr].canvasAssets) {
+                entries[dateStr].canvasAssets.forEach(a => {
+                    createFloatingAssetElement(a.id, a.type, a.content, a.x, a.y);
                 });
             }
             renderEntryList();
@@ -641,7 +659,7 @@
         function deleteCurrentEntry() {
             if (!currentEntryId) return;
             if (confirm("Delete this diary page?")) {
-                clearAllFloatingStickers();
+                clearAllFloatingAssets();
                 delete entries[currentEntryId];
                 saveToStorage();
                 currentEntryId = null;
@@ -654,7 +672,6 @@
             }
         }
 
-        function shadowSpawn(emoji) { spawnSticker(emoji); }
         function saveToStorage() { localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries)); }
         function exportBackup() {
             if (Object.keys(entries).length === 0) return alert("Journal is empty!");
