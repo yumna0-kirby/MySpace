@@ -82,7 +82,6 @@
             margin-bottom: 1rem;
         }
         
-        /* Neatly group syncing fields and allow hiding them */
         .sync-setup-group {
             margin-bottom: 1rem;
             border-bottom: 1px dashed var(--border);
@@ -217,7 +216,6 @@
             outline: none;
         }
 
-        /* Cute Emoji Bullet Tool section */
         .bullet-tools {
             display: flex;
             align-items: center;
@@ -271,7 +269,6 @@
             font-style: italic;
         }
 
-        /* --- Cute Custom Bullets --- */
         .editor-input ul {
             list-style: none;
             padding-left: 1.5rem;
@@ -440,7 +437,7 @@
             <h1>Secret Garden 🔐</h1>
             <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Enter your password to unlock</p>
             
-            <!-- This container holds keys during first setup and automatically hides later -->
+            <!-- Credentials layout section -->
             <div id="syncSetupContainer" class="sync-setup-group">
                 <input type="text" id="dbUrl" class="password-input" placeholder="Supabase URL">
                 <input type="password" id="dbAnonKey" class="password-input" placeholder="Supabase Anon Key">
@@ -482,7 +479,6 @@
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
                 
-                <!-- Cute Bullet Lists Tools Section -->
                 <div class="bullet-tools">
                     <span>Lists:</span>
                     <button class="tool-btn" onclick="insertCuteBullet('🌸')">🌸</button>
@@ -539,14 +535,14 @@
         let entries = {};
         let currentEntryId = null;
 
-        // AUTOMATIC CREDENTIAL DETECTION LOGIC
+        // Immediately check device cache when the file page mounts
         const savedUrl = localStorage.getItem('sb_url') || '';
         const savedKey = localStorage.getItem('sb_key') || '';
 
-        document.getElementById('dbUrl').value = savedUrl;
-        document.getElementById('dbAnonKey').value = savedKey;
+        if (savedUrl) document.getElementById('dbUrl').value = savedUrl;
+        if (savedKey) document.getElementById('dbAnonKey').value = savedKey;
 
-        // Hide credentials container automatically if keys are already remembered inside device storage
+        // Instantly toggle credential elements away if already present
         if (savedUrl && savedKey) {
             document.getElementById('syncSetupContainer').style.display = 'none';
         }
@@ -561,20 +557,24 @@
                 return;
             }
 
+            // Save elements into local storage IMMEDIATELY before initializing
             if (url && key) {
+                localStorage.setItem('sb_url', url);
+                localStorage.setItem('sb_key', key);
+                document.getElementById('syncSetupContainer').style.display = 'none';
+                
                 try {
                     supabaseClient = supabase.createClient(url, key);
-                    localStorage.setItem('sb_url', url);
-                    localStorage.setItem('sb_key', key);
                     await pullDataFromCloud();
                 } catch (err) {
-                    console.warn("Cloud connection issue. Reverting to local device cache.");
+                    console.warn("Cloud client failure, reverting to device cache storage fallback.");
                     loadLocalFallback();
                 }
             } else {
                 loadLocalFallback();
             }
 
+            // Smooth UI Unlock presentation animation 
             const lockScreen = document.getElementById('lockScreen');
             lockScreen.style.opacity = '0';
             setTimeout(() => lockScreen.style.visibility = 'hidden', 500);
@@ -618,7 +618,6 @@
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
         function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); document.getElementById('diaryText').focus(); }
 
-        // --- CUTE BULLET LOGIC ---
         function insertCuteBullet(emoji) {
             document.getElementById('diaryText').focus();
             const selection = window.getSelection();
