@@ -134,7 +134,7 @@
             text-overflow: ellipsis;
         }
 
-        /* --- Main Content Workspace --- */
+        /* --- Main Content --- */
         .main-content {
             flex: 1;
             display: flex;
@@ -205,7 +205,6 @@
             outline: none;
         }
 
-        /* Highlight Palette */
         .highlight-palette {
             display: flex;
             align-items: center;
@@ -223,12 +222,11 @@
             border-radius: 50%;
             cursor: pointer;
             border: 1px solid rgba(0,0,0,0.1);
-            transition: transform 0.1s ease;
         }
-        .hl-dot:hover { transform: scale(1.2); }
 
         .workspace-split { display: flex; flex: 1; overflow: hidden; position: relative; }
 
+        /* CRITICAL FIXED COMPONENT: Scroll container holds absolute children safely */
         .editor-input {
             flex: 1;
             background: transparent;
@@ -239,6 +237,7 @@
             line-height: 1.7;
             outline: none;
             overflow-y: auto;
+            position: relative; /* Targets children alignment inside scrolling view */
             -webkit-overflow-scrolling: touch;
             z-index: 1;
         }
@@ -282,61 +281,98 @@
             font-size: 2.2rem;
             cursor: grab;
             user-select: none;
-            transition: transform 0.2s;
         }
-        .tray-sticker:hover { transform: scale(1.15); }
 
-        /* --- UNIFIED CANVAS DRAGGABLE ASSETS --- */
+        /* --- ADVANCED ADJUSTABLE SCUBBOOK ASSETS --- */
         .scrapbook-asset {
             position: absolute;
             cursor: move;
-            user-select: none;
             z-index: 50;
             touch-action: none;
+            display: inline-block;
+            padding: 10px;
+            border: 1px solid transparent;
+            transition: border-color 0.15s ease;
         }
 
-        .scrapbook-asset.sticker-asset {
-            font-size: 2.8rem;
+        /* Show selection bounding box outline on focus/hover */
+        .scrapbook-asset:hover, .scrapbook-asset:active {
+            border: 1px dashed var(--accent);
+            border-radius: 6px;
+        }
+
+        .asset-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scrapbook-asset.sticker-asset .asset-wrapper {
             line-height: 1;
         }
 
-        .scrapbook-asset.photo-asset {
-            max-width: 220px;
+        .scrapbook-asset.photo-asset .asset-wrapper {
             background: white;
-            padding: 8px 8px 24px 8px;
+            padding: 8px 8px 20px 8px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 10px rgba(247, 177, 189, 0.3);
+            box-shadow: 0 4px 10px rgba(247, 177, 189, 0.25);
             border-radius: 4px;
-            transform: rotate(-2deg); /* Polarised look */
         }
 
         .scrapbook-asset.photo-asset img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: contain;
             display: block;
-            border-radius: 2px;
-            pointer-events: none; /* Passes control directly down to touch handler wrapper */
+            pointer-events: none;
         }
 
-        .delete-asset-btn {
+        /* --- CONTROL HANDLES --- */
+        .control-handle {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 50%;
             width: 20px;
             height: 20px;
-            font-size: 0.75rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 50%;
             display: none;
             align-items: center;
             justify-content: center;
+            font-size: 0.7rem;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
             z-index: 60;
+            color: var(--text-main);
+            user-select: none;
         }
-        .scrapbook-asset:hover .delete-asset-btn { display: flex; }
+
+        .scrapbook-asset:hover .control-handle,
+        .scrapbook-asset:active .control-handle {
+            display: flex;
+        }
+
+        .handle-delete {
+            top: -10px;
+            right: -10px;
+            background: var(--danger);
+            color: white;
+        }
+
+        .handle-resize {
+            bottom: -10px;
+            right: -10px;
+            cursor: se-resize;
+            background: #fff3b0;
+        }
+
+        .handle-rotate {
+            top: -10px;
+            left: -10px;
+            cursor: grab;
+            background: #c7f9cc;
+        }
 
         #imageInput { display: none; }
 
@@ -351,6 +387,7 @@
 </head>
 <body>
 
+    <!-- Lock Screen -->
     <div id="lockScreen">
         <div class="lock-container">
             <h1>Secret Garden 🔐</h1>
@@ -361,6 +398,7 @@
         </div>
     </div>
 
+    <!-- Sidebar Component -->
     <div class="sidebar" id="sidebar">
         <h2>My Blooming Thoughts 🌸</h2>
         <button class="btn-primary" style="margin-bottom: 1rem;" onclick="createNewEntry()">+ New Entry</button>
@@ -369,6 +407,7 @@
         <button class="btn-secondary" onclick="exportBackup()">📥 Download Backup</button>
     </div>
 
+    <!-- Main Workspace -->
     <div class="main-content" id="mainWorkspace">
         <div class="toolbar">
             <div class="left-toolbar-group">
@@ -382,6 +421,7 @@
         </div>
 
         <div class="editor-container" id="editorContainer" style="display: none;">
+            <!-- Format Tools Bar -->
             <div class="editor-tools">
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
@@ -407,9 +447,11 @@
                 <input type="file" id="imageInput" accept="image/*" onchange="handleScrapbookImageUpload(event)">
             </div>
             
-            <div class="workspace-split" id="canvasSplitContainer">
+            <div class="workspace-split">
+                <!-- Rich Text Document Container Layer (Parents items securely) -->
                 <div class="editor-input" id="diaryText" contenteditable="true" placeholder="Pour your heart out here..."></div>
                 
+                <!-- Accessories Side Panel -->
                 <div class="scrapbook-sidebar">
                     <h4>Stickers ✨</h4>
                     <div class="sticker-grid">
@@ -451,59 +493,203 @@
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
         function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); document.getElementById('diaryText').focus(); }
 
-        // --- UNIFIED DRAGGABLE CANVAS ASSETS ENGINE ---
+        // --- SCRAPBOOK DRAG / ROTATE / RESIZE ENGINE ---
         function handleScrapbookImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            if (file.size > 2 * 1024 * 1024) { 
-                alert("Please compress image files down under 2MB to keep performance fast!");
-                return;
-            }
             const reader = new FileReader();
             reader.onload = function(e) {
-                spawnAsset('photo', e.target.result);
+                // Drop image centered near current viewport scroll area
+                const scrollOffset = document.getElementById('diaryText').scrollTop + 50;
+                spawnAsset('photo', e.target.result, 50, scrollOffset, 180, 0);
             };
             reader.readAsDataURL(file);
             event.target.value = '';
         }
 
-        function spawnAsset(type, content, x = 120, y = 120) {
+        function spawnAsset(type, content, x = 40, y = 40, size = 160, rotation = 0) {
             if (!currentEntryId) return;
             
+            // Adjust default sizing bounds based on asset type
+            if (type === 'sticker' && size === 160) size = 40; // Font size scale instead
+
             const assetId = 'asset_' + Date.now() + Math.random().toString(36).substr(2, 5);
-            createFloatingAssetElement(assetId, type, content, x, y);
+            createFloatingAssetElement(assetId, type, content, x, y, size, rotation);
             
             if (!entries[currentEntryId].canvasAssets) entries[currentEntryId].canvasAssets = [];
-            entries[currentEntryId].canvasAssets.push({ id: assetId, type: type, content: content, x: x, y: y });
+            entries[currentEntryId].canvasAssets.push({ id: assetId, type: type, content: content, x: x, y: y, size: size, rotation: rotation });
             saveToStorage();
         }
 
-        function createFloatingAssetElement(id, type, content, x, y) {
+        function createFloatingAssetElement(id, type, content, x, y, size, rotation) {
             const assetEl = document.createElement('div');
             assetEl.id = id;
             assetEl.className = `scrapbook-asset ${type}-asset`;
+            assetEl.setAttribute('contenteditable', 'false'); // Stops text selection mixing
+            
+            // Layout setups
             assetEl.style.left = x + 'px';
             assetEl.style.top = y + 'px';
-
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'asset-wrapper';
+            
             if (type === 'sticker') {
-                assetEl.innerHTML = `${content}`;
+                wrapper.innerHTML = content;
+                wrapper.style.fontSize = size + 'px';
             } else if (type === 'photo') {
-                assetEl.innerHTML = `<img src="${content}" alt="Scrapbook Memory" />`;
+                wrapper.innerHTML = `<img src="${content}" />`;
+                assetEl.style.width = size + 'px';
+            }
+            assetEl.appendChild(wrapper);
+
+            // Append control dots
+            assetEl.innerHTML += `
+                <div class="control-handle handle-delete" onclick="removeAsset('${id}', event)">×</div>
+                <div class="control-handle handle-rotate">↻</div>
+                <div class="control-handle handle-resize">⤡</div>
+            `;
+
+            // Core placement assignment: Append inside scrolling text body!
+            document.getElementById('diaryText').appendChild(assetEl);
+            applyAssetInteractions(assetEl, id, type);
+            updateVisualTransform(assetEl, rotation);
+        }
+
+        function updateVisualTransform(elmnt, angle) {
+            elmnt.style.transform = `rotate(${angle}deg)`;
+            elmnt.setAttribute('data-rotation', angle);
+        }
+
+        function applyAssetInteractions(elmnt, id, type) {
+            let isDragging = false, isResizing = false, isRotating = false;
+            let startX, startY, startLeft, startTop, startSize, startAngle;
+
+            elmnt.addEventListener('mousedown', initDrag);
+            elmnt.addEventListener('touchstart', initDrag, { passive: false });
+
+            const resizeHandle = elmnt.querySelector('.handle-resize');
+            resizeHandle.addEventListener('mousedown', initResize);
+            resizeHandle.addEventListener('touchstart', initResize, { passive: false });
+
+            const rotateHandle = elmnt.querySelector('.handle-rotate');
+            rotateHandle.addEventListener('mousedown', initRotate);
+            rotateHandle.addEventListener('touchstart', initRotate, { passive: false });
+
+            function getEventCoords(e) {
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }
+                return { x: e.clientX, y: e.clientY };
             }
 
-            // Create contextual cross button overlay
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-asset-btn';
-            deleteBtn.innerText = '×';
-            deleteBtn.onclick = (e) => removeAsset(id, e);
-            assetEl.appendChild(deleteBtn);
-            
-            document.getElementById('canvasSplitContainer').appendChild(assetEl);
-            makeElementDraggable(assetEl);
+            // --- DRAG EVENT UTILITIES ---
+            function initDrag(e) {
+                if (e.target.classList.contains('control-handle')) return;
+                e.preventDefault();
+                isDragging = true;
+                const coords = getEventCoords(e);
+                startX = coords.x;
+                startY = coords.y;
+                startLeft = parseInt(elmnt.style.left) || 0;
+                startTop = parseInt(elmnt.style.top) || 0;
+
+                document.addEventListener('mousemove', doDrag);
+                document.addEventListener('touchmove', doDrag, { passive: false });
+                document.addEventListener('mouseup', endAllTrackers);
+                document.addEventListener('touchend', endAllTrackers);
+            }
+
+            function doDrag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                const coords = getEventCoords(e);
+                const dx = coords.x - startX;
+                const dy = coords.y - startY;
+                elmnt.style.left = (startLeft + dx) + 'px';
+                elmnt.style.top = (startTop + dy) + 'px';
+            }
+
+            // --- RESIZE EVENT UTILITIES ---
+            function initResize(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                isResizing = true;
+                const coords = getEventCoords(e);
+                startX = coords.x;
+                startSize = type === 'sticker' ? parseFloat(elmnt.querySelector('.asset-wrapper').style.fontSize) : parseInt(elmnt.style.width);
+
+                document.addEventListener('mousemove', doResize);
+                document.addEventListener('touchmove', doResize, { passive: false });
+                document.addEventListener('mouseup', endAllTrackers);
+                document.addEventListener('touchend', endAllTrackers);
+            }
+
+            function doResize(e) {
+                if (!isResizing) return;
+                e.preventDefault();
+                const coords = getEventCoords(e);
+                const dx = coords.x - startX;
+                let newSize = Math.max(20, startSize + dx);
+
+                if (type === 'sticker') {
+                    elmnt.querySelector('.asset-wrapper').style.fontSize = newSize + 'px';
+                } else {
+                    elmnt.style.width = newSize + 'px';
+                }
+            }
+
+            // --- ROTATE EVENT UTILITIES ---
+            function initRotate(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                isRotating = true;
+                const coords = getEventCoords(e);
+                const rect = elmnt.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                startAngle = Math.atan2(coords.y - centerY, coords.x - centerX) * (180 / Math.PI);
+                currentRotation = parseFloat(elmnt.getAttribute('data-rotation')) || 0;
+
+                function doRotate(ev) {
+                    if (!isRotating) return;
+                    ev.preventDefault();
+                    const moveCoords = getEventCoords(ev);
+                    const moveAngle = Math.atan2(moveCoords.y - centerY, moveCoords.x - centerX) * (180 / Math.PI);
+                    let targetRotation = currentRotation + (moveAngle - startAngle);
+                    updateVisualTransform(elmnt, targetRotation);
+                }
+
+                document.addEventListener('mousemove', doRotate);
+                document.addEventListener('touchmove', doRotate, { passive: false });
+                document.addEventListener('mouseup', endAllTrackers);
+                document.addEventListener('touchend', endAllTrackers);
+            }
+
+            function endAllTrackers() {
+                document.removeEventListener('mousemove', doDrag);
+                document.removeEventListener('touchmove', doDrag);
+                document.removeEventListener('mousemove', doResize);
+                document.removeEventListener('touchmove', doResize);
+                isDragging = false; isResizing = false; isRotating = false;
+                
+                // Keep dimensions synchronized into memory state model
+                if (currentEntryId && entries[currentEntryId].canvasAssets) {
+                    const match = entries[currentEntryId].canvasAssets.find(a => a.id === id);
+                    if (match) {
+                        match.x = parseInt(elmnt.style.left);
+                        match.y = parseInt(elmnt.style.top);
+                        match.rotation = parseFloat(elmnt.getAttribute('data-rotation')) || 0;
+                        match.size = type === 'sticker' ? parseFloat(elmnt.querySelector('.asset-wrapper').style.fontSize) : parseInt(elmnt.style.width);
+                        saveToStorage();
+                    }
+                }
+            }
         }
 
         function removeAsset(id, event) {
-            event.stopPropagation();
+            if(event) event.stopPropagation();
             const element = document.getElementById(id);
             if (element) element.remove();
             
@@ -517,68 +703,7 @@
             document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
         }
 
-        function makeElementDraggable(elmnt) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            elmnt.onmousedown = dragMouseDown;
-            elmnt.ontouchstart = dragTouchStart;
-
-            function dragMouseDown(e) {
-                if (e.target.className === 'delete-asset-btn') return;
-                e.preventDefault();
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
-            }
-
-            function dragTouchStart(e) {
-                if (e.target.className === 'delete-asset-btn') return;
-                pos3 = e.touches[0].clientX;
-                pos4 = e.touches[0].clientY;
-                document.ontouchend = closeDragElement;
-                document.ontouchmove = elementTouchDrag;
-            }
-
-            function elementDrag(e) {
-                e.preventDefault();
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                updatePosition(elmnt.offsetTop - pos2, elmnt.offsetLeft - pos1);
-            }
-
-            function elementTouchDrag(e) {
-                pos1 = pos3 - e.touches[0].clientX;
-                pos2 = pos4 - e.touches[0].clientY;
-                pos3 = e.touches[0].clientX;
-                pos4 = e.touches[0].clientY;
-                updatePosition(elmnt.offsetTop - pos2, elmnt.offsetLeft - pos1);
-            }
-
-            function updatePosition(top, left) {
-                elmnt.style.top = top + "px";
-                elmnt.style.left = left + "px";
-            }
-
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-                document.ontouchend = null;
-                document.ontouchmove = null;
-                
-                if (currentEntryId && entries[currentEntryId].canvasAssets) {
-                    const match = entries[currentEntryId].canvasAssets.find(a => a.id === elmnt.id);
-                    if (match) {
-                        match.x = parseInt(elmnt.style.left);
-                        match.y = parseInt(elmnt.style.top);
-                        saveToStorage();
-                    }
-                }
-            }
-        }
-
-        // --- DIARY ENGINE BACKEND ---
+        // --- DIARY UTILITIES ENGINE ---
         function renderEntryList() {
             const listContainer = document.getElementById('entryList');
             const searchQuery = document.getElementById('search').value.toLowerCase();
@@ -636,10 +761,10 @@
             document.getElementById('saveBtn').style.display = 'block';
             document.getElementById('deleteBtn').style.display = 'block';
 
-            // Respawn all layered items for this entry
+            // Respawn customized configurations
             if (entries[dateStr].canvasAssets) {
                 entries[dateStr].canvasAssets.forEach(a => {
-                    createFloatingAssetElement(a.id, a.type, a.content, a.x, a.y);
+                    createFloatingAssetElement(a.id, a.type, a.content, a.x, a.y, a.size, a.rotation);
                 });
             }
             renderEntryList();
@@ -647,6 +772,10 @@
 
         function saveCurrentEntry() {
             if (!currentEntryId) return;
+            // Clean control handle fragments before reading internal HTML states safely
+            const textCleaner = document.getElementById('diaryText').cloneNode(true);
+            textCleaner.querySelectorAll('.control-handle').forEach(h => h.remove());
+            
             entries[currentEntryId].text = document.getElementById('diaryText').innerHTML;
             saveToStorage();
             renderEntryList();
@@ -666,8 +795,8 @@
                 document.getElementById('diaryText').innerHTML = '';
                 document.getElementById('displayDate').innerText = 'Select or Create an Entry';
                 document.getElementById('editorContainer').style.display = 'none';
-                document.getElementById('saveBtn').style.display = 'none';
-                document.getElementById('deleteBtn').style.display = 'none';
+                document.getElementById('saveBtn').style.none = 'none';
+                document.getElementById('deleteBtn').style.none = 'none';
                 renderEntryList();
             }
         }
