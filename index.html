@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Private Garden of Thoughts</title>
+    <!-- Include Supabase for Real-Time Cross-Device Syncing -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -193,6 +194,7 @@
             overflow-x: auto;
             white-space: nowrap;
             scrollbar-width: none; 
+            position: relative;
         }
         .editor-tools::-webkit-scrollbar { display: none; }
 
@@ -357,7 +359,7 @@
             pointer-events: none;
         }
 
-        /* --- CUTE CUSTOME FRAMES STYLES --- */
+        /* --- CUTE CUSTOM FRAMES STYLES --- */
         .frame-none { }
         
         .frame-blossom {
@@ -377,7 +379,7 @@
 
         .frame-vintage {
             background: #fdfaf7 !important;
-            padding: 8px 8px 32px 8px !important; /* Authentic polaroid bottom spacing */
+            padding: 8px 8px 32px 8px !important; 
             border: 1px solid #e2d9cf !important;
             box-shadow: 0 6px 14px rgba(0,0,0,0.12) !important;
             border-radius: 2px !important;
@@ -397,7 +399,7 @@
         }
 
         .frame-clean {
-            border: 4px solid #ebd2b0 !important; /* Elegant Soft Gold */
+            border: 4px solid #ebd2b0 !important; 
             padding: 2px !important;
             border-radius: 0px !important;
             box-shadow: 2px 2px 8px rgba(0,0,0,0.15) !important;
@@ -410,11 +412,11 @@
             border: 2px solid var(--border);
             border-radius: 16px;
             padding: 0.75rem;
-            box-shadow: 0 6px 20px rgba(247, 177, 189, 0.4);
+            box-shadow: 0 8px 24px rgba(74, 40, 45, 0.18), 0 2px 8px rgba(247, 177, 189, 0.4);
             display: none;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.5rem;
-            z-index: 500;
+            z-index: 2000; /* Brought to the absolute front of stacking layer context */
             top: 45px;
         }
         .frame-opt {
@@ -497,6 +499,7 @@
 </head>
 <body>
 
+    <!-- PAGE 1: CLOUD SETUP VIEW -->
     <div id="setupPage" class="fullscreen-overlay" style="display: none;">
         <div class="lock-container">
             <h1>Cloud Link ☁️</h1>
@@ -510,6 +513,7 @@
         </div>
     </div>
 
+    <!-- PAGE 2: DIARY PASSCODE LOCK -->
     <div id="lockScreen" class="fullscreen-overlay" style="display: none;">
         <div class="lock-container">
             <h1>Secret Garden 🔐</h1>
@@ -524,6 +528,7 @@
         </div>
     </div>
 
+    <!-- Sidebar Component -->
     <div class="sidebar" id="sidebar">
         <h2>My Blooming Thoughts 🌸</h2>
         <button class="btn-primary" style="margin-bottom: 1rem;" onclick="createNewEntry()">+ New Entry</button>
@@ -532,6 +537,7 @@
         <button class="btn-secondary" onclick="exportBackup()">📥 Download Backup</button>
     </div>
 
+    <!-- Main Workspace -->
     <div class="main-content" id="mainWorkspace">
         <div class="toolbar">
             <div class="left-toolbar-group">
@@ -545,7 +551,8 @@
         </div>
 
         <div class="editor-container" id="editorContainer" style="display: none;">
-            <div class="editor-tools" style="position: relative;">
+            <!-- Format Tools Bar -->
+            <div class="editor-tools">
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
                 
@@ -577,6 +584,7 @@
                 <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Floating Photo</button>
                 <input type="file" id="imageInput" accept="image/*" onchange="handleScrapbookImageUpload(event)">
 
+                <!-- Floating Frame Chooser Dropdown Panel -->
                 <div class="frame-popup" id="frameDropdown">
                     <div class="frame-opt" onclick="applyFrameStyle('none')">❌ None</div>
                     <div class="frame-opt" onclick="applyFrameStyle('blossom')">🌸 Blossom</div>
@@ -614,7 +622,7 @@
         let supabaseClient = null;
         let entries = {};
         let currentEntryId = null;
-        let activeFrameAssetId = null; // Track which photo wants a frame change
+        let activeFrameAssetId = null; 
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedUrl = localStorage.getItem('sb_url');
@@ -627,7 +635,6 @@
                 supabaseClient = supabase.createClient(savedUrl, savedKey);
             }
             
-            // Dismiss frame context panel on random body tap clicks
             document.addEventListener('click', (e) => {
                 if(!e.target.classList.contains('handle-frame') && !e.target.closest('#frameDropdown')) {
                     document.getElementById('frameDropdown').style.display = 'none';
@@ -806,7 +813,6 @@
                 <div class="control-handle handle-resize">⤡</div>
             `;
 
-            // If it's a photo asset, add the custom frame select handle option icon
             if (type === 'photo') {
                 assetEl.innerHTML += `<div class="control-handle handle-frame" onclick="openFrameDropdown('${id}', event)">🖼️</div>`;
             }
@@ -822,7 +828,7 @@
             const dropdown = document.getElementById('frameDropdown');
             dropdown.style.display = 'grid';
             
-            // Automatically position next to tool buttons on top bar safely
+            // Fixed top bar placement calculation logic
             dropdown.style.left = Math.min(event.clientX - 60, window.innerWidth - 240) + 'px';
         }
 
@@ -832,12 +838,10 @@
             if (targetAsset) {
                 const wrapper = targetAsset.querySelector('.asset-wrapper');
                 
-                // Reset all old classes cleanly
                 wrapper.className = 'asset-wrapper';
                 wrapper.classList.add(`frame-${styleName}`);
                 wrapper.setAttribute('data-frame-style', styleName);
                 
-                // Update item instance state properties across main database layout arrays
                 if (currentEntryId && entries[currentEntryId].canvasAssets) {
                     const assetMatch = entries[currentEntryId].canvasAssets.find(a => a.id === activeFrameAssetId);
                     if (assetMatch) {
