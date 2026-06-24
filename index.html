@@ -150,7 +150,32 @@
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; z-index: 5; gap: 0.5rem; }
         .left-toolbar-group { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
         .current-date { font-size: 1.1rem; font-style: italic; }
-        .btn-group { display: flex; gap: 0.5rem; }
+        .btn-group { display: flex; align-items: center; gap: 0.5rem; }
+
+        /* Sync Status Pill */
+        .sync-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            min-height: 40px;
+        }
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cccccc;
+        }
+        .sync-dot.synced { background: #2ec4b6; box-shadow: 0 0 8px #2ec4b6; }
+        .sync-dot.pending { background: #ffb703; box-shadow: 0 0 8px #ffb703; }
+        .sync-dot.error { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
 
         button, .toggle-sidebar-btn {
             padding: 0.6rem 1rem;
@@ -416,7 +441,7 @@
             display: none;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.5rem;
-            z-index: 2000; /* Brought to the absolute front of stacking layer context */
+            z-index: 2000; 
             top: 45px;
         }
         .frame-opt {
@@ -545,6 +570,11 @@
                 <div class="current-date" id="displayDate">Select or Create an Entry</div>
             </div>
             <div class="btn-group">
+                <!-- Cloud Sync Status Light -->
+                <div class="sync-status-pill" id="syncStatusIndicator" onclick="manualSyncTrigger()">
+                    <div class="sync-dot" id="syncStatusDot"></div>
+                    <span id="syncStatusText">Offline</span>
+                </div>
                 <button class="btn-danger" id="deleteBtn" onclick="deleteCurrentEntry()" style="display: none;">Delete</button>
                 <button class="btn-primary" id="saveBtn" onclick="saveCurrentEntry()" style="display: none;">Save</button>
             </div>
@@ -630,9 +660,11 @@
 
             if (!savedUrl || !savedKey) {
                 document.getElementById('setupPage').style.display = 'flex';
+                updateSyncStatus('error', 'No Config');
             } else {
                 document.getElementById('lockScreen').style.display = 'flex';
                 supabaseClient = supabase.createClient(savedUrl, savedKey);
+                updateSyncStatus('pending', 'Locked');
             }
             
             document.addEventListener('click', (e) => {
@@ -641,6 +673,39 @@
                 }
             });
         });
+
+        function updateSyncStatus(state, label) {
+            const dot = document.getElementById('syncStatusDot');
+            const txt = document.getElementById('syncStatusText');
+            if(!dot || !txt) return;
+
+            dot.className = 'sync-dot';
+            if (state === 'synced') { dot.classList.add('synced'); txt.innerText = label || 'Synced'; }
+            else if (state === 'pending') { dot.classList.add('pending'); txt.innerText = label || 'Connecting...'; }
+            else { dot.classList.add('error'); txt.innerText = label || 'Offline'; }
+        }
+
+        async function manualSyncTrigger() {
+            if (!supabaseClient) {
+                alert("Cloud configuration missing! Tap 'Update Cloud Keys' on the lockscreen.");
+                return;
+            }
+            updateSyncStatus('pending', 'Syncing...');
+            try {
+                await pullDataFromCloud();
+                renderEntryList();
+                if (currentEntryId && entries[currentEntryId]) {
+                    loadEntry(currentEntryId);
+                } else {
+                    const sortedDates = Object.keys(entries).sort((a, b) => b.localeCompare(a));
+                    if (sortedDates.length > 0) loadEntry(sortedDates[0]);
+                }
+                updateSyncStatus('synced', 'Synced');
+            } catch (err) {
+                console.error(err);
+                updateSyncStatus('error', 'Sync Fail');
+            }
+        }
 
         function saveCloudCredentials() {
             const url = document.getElementById('dbUrl').value.trim();
@@ -657,6 +722,7 @@
 
             document.getElementById('setupPage').style.display = 'none';
             document.getElementById('lockScreen').style.display = 'flex';
+            updateSyncStatus('pending', 'Locked');
         }
 
         function resetCloudSetup() {
@@ -664,6 +730,7 @@
             localStorage.removeItem('sb_key');
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('setupPage').style.display = 'flex';
+            updateSyncStatus('error', 'No Config');
         }
 
         async function unlockDiary() {
@@ -674,15 +741,20 @@
                 return;
             }
 
+            updateSyncStatus('pending', 'Loading...');
+
             if (supabaseClient) {
                 try {
                     await pullDataFromCloud();
+                    updateSyncStatus('synced', 'Synced');
                 } catch (err) {
                     console.warn("Cloud pull connection issue. Reverting to device storage cache.");
                     loadLocalFallback();
+                    updateSyncStatus('error', 'Local Mode');
                 }
             } else {
                 loadLocalFallback();
+                updateSyncStatus('error', 'Local Mode');
             }
 
             const lockScreen = document.getElementById('lockScreen');
@@ -704,7 +776,8 @@
         async function pullDataFromCloud() {
             if (!supabaseClient) return;
             const { data, error } = await supabaseClient.from('diary_entries').select('*');
-            if (!error && data) {
+            if (error) throw error;
+            if (data) {
                 entries = {};
                 data.forEach(row => {
                     entries[row.entry_date] = {
@@ -717,17 +790,24 @@
         }
 
         async function pushEntryToCloud(idStr) {
-            if (!supabaseClient) {
-                localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
-                return;
-            }
+            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
+            if (!supabaseClient) return;
+            
+            updateSyncStatus('pending', 'Saving...');
             const target = entries[idStr];
-            await supabaseClient.from('diary_entries').upsert({
+            const { error } = await supabaseClient.from('diary_entries').upsert({
                 entry_date: idStr,
                 text_content: target.text,
                 assets: target.canvasAssets,
                 display_date: target.display_date
             });
+
+            if (error) {
+                console.error("Cloud push failed:", error);
+                updateSyncStatus('error', 'Save Error');
+            } else {
+                updateSyncStatus('synced', 'Synced');
+            }
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
@@ -828,7 +908,6 @@
             const dropdown = document.getElementById('frameDropdown');
             dropdown.style.display = 'grid';
             
-            // Fixed top bar placement calculation logic
             dropdown.style.left = Math.min(event.clientX - 60, window.innerWidth - 240) + 'px';
         }
 
