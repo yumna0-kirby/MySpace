@@ -424,7 +424,7 @@
 </head>
 <body>
 
-    <!-- PAGE 1: CLOUD SETUP VIEW (Only shows if keys are missing) -->
+    <!-- PAGE 1: CLOUD SETUP VIEW -->
     <div id="setupPage" class="fullscreen-overlay" style="display: none;">
         <div class="lock-container">
             <h1>Cloud Link ☁️</h1>
@@ -537,7 +537,6 @@
         let entries = {};
         let currentEntryId = null;
 
-        // --- PAGE MANAGEMENT NAVIGATION ENGINE ---
         window.addEventListener('DOMContentLoaded', () => {
             const savedUrl = localStorage.getItem('sb_url');
             const savedKey = localStorage.getItem('sb_key');
@@ -599,7 +598,6 @@
             
             renderEntryList();
             
-            // Auto-load most recent entry if any exist
             const sortedDates = Object.keys(entries).sort((a, b) => b.localeCompare(a));
             if (sortedDates.length > 0) {
                 loadEntry(sortedDates[0]);
@@ -616,7 +614,6 @@
             if (!error && data) {
                 entries = {};
                 data.forEach(row => {
-                    // row.entry_date acts as a unique ID string now (contains dynamic timestamp strings)
                     entries[row.entry_date] = {
                         text: row.text_content,
                         display_date: row.display_date || row.entry_date.split('_')[0],
@@ -686,10 +683,19 @@
             
             if (!entries[currentEntryId].canvasAssets) entries[currentEntryId].canvasAssets = [];
             entries[currentEntryId].canvasAssets.push({ id: assetId, type: type, content: content, x: x, y: y, size: size, rotation: rotation });
+            
+            // Clean extra script tags out of inner text saving layer
+            const txtArea = document.getElementById('diaryText').cloneNode(true);
+            txtArea.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
+            entries[currentEntryId].text = txtArea.innerHTML;
+
             pushEntryToCloud(currentEntryId);
         }
 
         function createFloatingAssetElement(id, type, content, x, y, size, rotation) {
+            // Prevent duplication if it already exists in the DOM
+            if (document.getElementById(id)) return;
+
             const assetEl = document.createElement('div');
             assetEl.id = id;
             assetEl.className = `scrapbook-asset ${type}-asset`;
@@ -729,6 +735,7 @@
             let isDragging = false, isResizing = false, isRotating = false;
             let startX, startY, startLeft, startTop, startSize, startAngle;
 
+            // Explicitly enable touch handles for mobile and iPad screens
             elmnt.addEventListener('mousedown', initDrag);
             elmnt.addEventListener('touchstart', initDrag, { passive: false });
 
@@ -831,6 +838,12 @@
                         match.y = parseInt(elmnt.style.top);
                         match.rotation = parseFloat(elmnt.getAttribute('data-rotation')) || 0;
                         match.size = type === 'sticker' ? parseFloat(elmnt.querySelector('.asset-wrapper').style.fontSize) : parseInt(elmnt.style.width);
+                        
+                        // Sync visual adjustments back to database text content layer
+                        const txtArea = document.getElementById('diaryText').cloneNode(true);
+                        txtArea.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
+                        entries[currentEntryId].text = txtArea.innerHTML;
+                        
                         pushEntryToCloud(currentEntryId);
                     }
                 }
@@ -856,7 +869,6 @@
             const searchQuery = document.getElementById('search').value.toLowerCase();
             listContainer.innerHTML = '';
 
-            // Sort newest entries completely to the top
             const sortedIds = Object.keys(entries).sort((a, b) => b.localeCompare(a));
             sortedIds.forEach(id => {
                 const entryData = entries[id];
@@ -874,7 +886,6 @@
                         weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
                     });
 
-                    // Add a tiny time indicator if there are multiple entries on the same day
                     const timeLabel = id.includes('_') ? ' ✨' : '';
 
                     item.innerHTML = `
@@ -887,18 +898,16 @@
         }
 
         function createNewEntry() {
-            // Generates an explicit 2026-06-23 date string regardless of hardware timezone offset
             const localDate = new Date();
             const year = localDate.getFullYear();
             const month = String(localDate.getMonth() + 1).padStart(2, '0');
             const day = String(localDate.getDate()).padStart(2, '0');
             const dateStr = `${year}-${month}-${day}`;
-            
-            // Build a totally unique system unique ID using time millisecond stamp
             const uniqueId = dateStr + '_' + Date.now();
 
+            // Set up an explicit paragraph breaks block so the text engine caret behaves even with no words yet
             entries[uniqueId] = { 
-                text: "", 
+                text: "<p><br></p>", 
                 display_date: dateStr, 
                 canvasAssets: [] 
             };
@@ -919,12 +928,19 @@
             });
 
             document.getElementById('displayDate').innerText = formattedDate;
-            document.getElementById('diaryText').innerHTML = entries[idStr].text || '';
+            
+            // Re-inject text content layer safely
+            let rawContent = entries[idStr].text || '';
+            if (rawContent.trim() === "") {
+                rawContent = "<p><br></p>";
+            }
+            document.getElementById('diaryText').innerHTML = rawContent;
             
             document.getElementById('editorContainer').style.display = 'flex';
             document.getElementById('saveBtn').style.display = 'block';
             document.getElementById('deleteBtn').style.display = 'block';
 
+            // RE-BIND INTERACTION ENGINE TO ALL IMAGES/STICKERS LOADED ON REFRESH
             if (entries[idStr].canvasAssets) {
                 entries[idStr].canvasAssets.forEach(a => {
                     createFloatingAssetElement(a.id, a.type, a.content, a.x, a.y, a.size, a.rotation);
@@ -935,10 +951,12 @@
 
         function saveCurrentEntry() {
             if (!currentEntryId) return;
-            const textCleaner = document.getElementById('diaryText').cloneNode(true);
-            textCleaner.querySelectorAll('.control-handle').forEach(h => h.remove());
             
-            entries[currentEntryId].text = document.getElementById('diaryText').innerHTML;
+            // Pull text elements strictly away from custom asset wrappers before parsing
+            const textCleaner = document.getElementById('diaryText').cloneNode(true);
+            textCleaner.querySelectorAll('.scrapbook-asset').forEach(h => h.remove());
+            
+            entries[currentEntryId].text = textCleaner.innerHTML;
             pushEntryToCloud(currentEntryId);
             renderEntryList();
             
