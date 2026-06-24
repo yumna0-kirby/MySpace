@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Private Garden of Thoughts</title>
-    <!-- Include Supabase for Real-Time Cross-Device Syncing -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -322,7 +321,7 @@
             z-index: 50;
             touch-action: none;
             display: inline-block;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid transparent;
         }
 
@@ -337,12 +336,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s ease;
         }
 
         .scrapbook-asset.sticker-asset .asset-wrapper { line-height: 1; }
+        
         .scrapbook-asset.photo-asset .asset-wrapper {
             background: white;
-            padding: 6px 6px 18px 6px;
+            padding: 6px 6px 6px 6px;
             border: 1px solid var(--border);
             box-shadow: 0 4px 10px rgba(247, 177, 189, 0.25);
             border-radius: 4px;
@@ -355,6 +356,77 @@
             display: block;
             pointer-events: none;
         }
+
+        /* --- CUTE CUSTOME FRAMES STYLES --- */
+        .frame-none { }
+        
+        .frame-blossom {
+            border: 6px double #ffccd5 !important;
+            padding: 4px !important;
+            background: #fff0f2 !important;
+            border-radius: 12px !important;
+        }
+        
+        .frame-coquette {
+            border: 3px solid #ff8fa3 !important;
+            border-radius: 8px !important;
+            position: relative;
+        }
+        .frame-coquette::before { content: '🎀'; position: absolute; top: -10px; left: -10px; font-size: 1.2rem; z-index: 10; }
+        .frame-coquette::after { content: '🎀'; position: absolute; bottom: -10px; right: -10px; font-size: 1.2rem; z-index: 10; }
+
+        .frame-vintage {
+            background: #fdfaf7 !important;
+            padding: 8px 8px 32px 8px !important; /* Authentic polaroid bottom spacing */
+            border: 1px solid #e2d9cf !important;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12) !important;
+            border-radius: 2px !important;
+        }
+
+        .frame-sparkle {
+            border: 3px dashed #fff3b0 !important;
+            padding: 6px !important;
+            box-shadow: 0 0 12px #fff3b0 !important;
+            border-radius: 14px !important;
+        }
+
+        .frame-gingham {
+            border: 8px solid #ffccd5 !important;
+            border-image: repeating-linear-gradient(45deg, #ffccd5, #ffccd5 10px, #ffffff 10px, #ffffff 20px) 10 !important;
+            padding: 4px !important;
+        }
+
+        .frame-clean {
+            border: 4px solid #ebd2b0 !important; /* Elegant Soft Gold */
+            padding: 2px !important;
+            border-radius: 0px !important;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15) !important;
+        }
+
+        /* --- FRAME SELECT MODAL POPUP --- */
+        .frame-popup {
+            position: absolute;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 0.75rem;
+            box-shadow: 0 6px 20px rgba(247, 177, 189, 0.4);
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            z-index: 500;
+            top: 45px;
+        }
+        .frame-opt {
+            padding: 0.4rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            background: var(--bg-main);
+        }
+        .frame-opt:hover { background: var(--bg-sidebar); }
 
         /* --- CONTROL HANDLES --- */
         .control-handle {
@@ -383,6 +455,7 @@
         .handle-delete { top: -12px; right: -12px; background: var(--danger); color: white; }
         .handle-resize { bottom: -12px; right: -12px; cursor: se-resize; background: #fff3b0; }
         .handle-rotate { top: -12px; left: -12px; cursor: grab; background: #c7f9cc; }
+        .handle-frame { bottom: -12px; left: -12px; background: var(--bg-sidebar); cursor: pointer; font-size: 0.7rem; }
 
         #imageInput { display: none; }
 
@@ -424,7 +497,6 @@
 </head>
 <body>
 
-    <!-- PAGE 1: CLOUD SETUP VIEW -->
     <div id="setupPage" class="fullscreen-overlay" style="display: none;">
         <div class="lock-container">
             <h1>Cloud Link ☁️</h1>
@@ -438,7 +510,6 @@
         </div>
     </div>
 
-    <!-- PAGE 2: DIARY PASSCODE LOCK -->
     <div id="lockScreen" class="fullscreen-overlay" style="display: none;">
         <div class="lock-container">
             <h1>Secret Garden 🔐</h1>
@@ -453,7 +524,6 @@
         </div>
     </div>
 
-    <!-- Sidebar Component -->
     <div class="sidebar" id="sidebar">
         <h2>My Blooming Thoughts 🌸</h2>
         <button class="btn-primary" style="margin-bottom: 1rem;" onclick="createNewEntry()">+ New Entry</button>
@@ -462,7 +532,6 @@
         <button class="btn-secondary" onclick="exportBackup()">📥 Download Backup</button>
     </div>
 
-    <!-- Main Workspace -->
     <div class="main-content" id="mainWorkspace">
         <div class="toolbar">
             <div class="left-toolbar-group">
@@ -476,8 +545,7 @@
         </div>
 
         <div class="editor-container" id="editorContainer" style="display: none;">
-            <!-- Format Tools Bar -->
-            <div class="editor-tools">
+            <div class="editor-tools" style="position: relative;">
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
                 <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
                 
@@ -508,6 +576,16 @@
 
                 <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Floating Photo</button>
                 <input type="file" id="imageInput" accept="image/*" onchange="handleScrapbookImageUpload(event)">
+
+                <div class="frame-popup" id="frameDropdown">
+                    <div class="frame-opt" onclick="applyFrameStyle('none')">❌ None</div>
+                    <div class="frame-opt" onclick="applyFrameStyle('blossom')">🌸 Blossom</div>
+                    <div class="frame-opt" onclick="applyFrameStyle('coquette')">🎀 Bows</div>
+                    <div class="frame-opt" onclick="applyFrameStyle('vintage')">🎞️ Vintage</div>
+                    <div class="frame-opt" onclick="applyFrameStyle('sparkle')">✨ Sparkle</div>
+                    <div class="frame-opt" onclick="applyFrameStyle('gingham')">🧸 Ribbon</div>
+                    <div class="frame-opt" onclick="applyFrameStyle('clean')">🌟 Gold</div>
+                </div>
             </div>
             
             <div class="workspace-split">
@@ -536,6 +614,7 @@
         let supabaseClient = null;
         let entries = {};
         let currentEntryId = null;
+        let activeFrameAssetId = null; // Track which photo wants a frame change
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedUrl = localStorage.getItem('sb_url');
@@ -547,6 +626,13 @@
                 document.getElementById('lockScreen').style.display = 'flex';
                 supabaseClient = supabase.createClient(savedUrl, savedKey);
             }
+            
+            // Dismiss frame context panel on random body tap clicks
+            document.addEventListener('click', (e) => {
+                if(!e.target.classList.contains('handle-frame') && !e.target.closest('#frameDropdown')) {
+                    document.getElementById('frameDropdown').style.display = 'none';
+                }
+            });
         });
 
         function saveCloudCredentials() {
@@ -668,23 +754,22 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const scrollOffset = document.getElementById('diaryText').scrollTop + 40;
-                spawnAsset('photo', e.target.result, 30, scrollOffset, 150, 0);
+                spawnAsset('photo', e.target.result, 30, scrollOffset, 150, 0, 'none');
             };
             reader.readAsDataURL(file);
             event.target.value = '';
         }
 
-        function spawnAsset(type, content, x = 30, y = 30, size = 150, rotation = 0) {
+        function spawnAsset(type, content, x = 30, y = 30, size = 150, rotation = 0, frame = 'none') {
             if (!currentEntryId) return;
             if (type === 'sticker' && size === 150) size = 45;
 
             const assetId = 'asset_' + Date.now() + Math.random().toString(36).substr(2, 4);
-            createFloatingAssetElement(assetId, type, content, x, y, size, rotation);
+            createFloatingAssetElement(assetId, type, content, x, y, size, rotation, frame);
             
             if (!entries[currentEntryId].canvasAssets) entries[currentEntryId].canvasAssets = [];
-            entries[currentEntryId].canvasAssets.push({ id: assetId, type: type, content: content, x: x, y: y, size: size, rotation: rotation });
+            entries[currentEntryId].canvasAssets.push({ id: assetId, type: type, content: content, x: x, y: y, size: size, rotation: rotation, frame: frame });
             
-            // Clean extra script tags out of inner text saving layer
             const txtArea = document.getElementById('diaryText').cloneNode(true);
             txtArea.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
             entries[currentEntryId].text = txtArea.innerHTML;
@@ -692,8 +777,7 @@
             pushEntryToCloud(currentEntryId);
         }
 
-        function createFloatingAssetElement(id, type, content, x, y, size, rotation) {
-            // Prevent duplication if it already exists in the DOM
+        function createFloatingAssetElement(id, type, content, x, y, size, rotation, frame = 'none') {
             if (document.getElementById(id)) return;
 
             const assetEl = document.createElement('div');
@@ -704,7 +788,8 @@
             assetEl.style.top = y + 'px';
             
             const wrapper = document.createElement('div');
-            wrapper.className = 'asset-wrapper';
+            wrapper.className = `asset-wrapper frame-${frame}`;
+            wrapper.setAttribute('data-frame-style', frame);
             
             if (type === 'sticker') {
                 wrapper.innerHTML = content;
@@ -721,9 +806,48 @@
                 <div class="control-handle handle-resize">⤡</div>
             `;
 
+            // If it's a photo asset, add the custom frame select handle option icon
+            if (type === 'photo') {
+                assetEl.innerHTML += `<div class="control-handle handle-frame" onclick="openFrameDropdown('${id}', event)">🖼️</div>`;
+            }
+
             document.getElementById('diaryText').appendChild(assetEl);
             applyAssetInteractions(assetEl, id, type);
             updateVisualTransform(assetEl, rotation);
+        }
+
+        function openFrameDropdown(id, event) {
+            event.stopPropagation();
+            activeFrameAssetId = id;
+            const dropdown = document.getElementById('frameDropdown');
+            dropdown.style.display = 'grid';
+            
+            // Automatically position next to tool buttons on top bar safely
+            dropdown.style.left = Math.min(event.clientX - 60, window.innerWidth - 240) + 'px';
+        }
+
+        function applyFrameStyle(styleName) {
+            if (!activeFrameAssetId) return;
+            const targetAsset = document.getElementById(activeFrameAssetId);
+            if (targetAsset) {
+                const wrapper = targetAsset.querySelector('.asset-wrapper');
+                
+                // Reset all old classes cleanly
+                wrapper.className = 'asset-wrapper';
+                wrapper.classList.add(`frame-${styleName}`);
+                wrapper.setAttribute('data-frame-style', styleName);
+                
+                // Update item instance state properties across main database layout arrays
+                if (currentEntryId && entries[currentEntryId].canvasAssets) {
+                    const assetMatch = entries[currentEntryId].canvasAssets.find(a => a.id === activeFrameAssetId);
+                    if (assetMatch) {
+                        assetMatch.frame = styleName;
+                        pushEntryToCloud(currentEntryId);
+                    }
+                }
+            }
+            document.getElementById('frameDropdown').style.display = 'none';
+            activeFrameAssetId = null;
         }
 
         function updateVisualTransform(elmnt, angle) {
@@ -735,7 +859,6 @@
             let isDragging = false, isResizing = false, isRotating = false;
             let startX, startY, startLeft, startTop, startSize, startAngle;
 
-            // Explicitly enable touch handles for mobile and iPad screens
             elmnt.addEventListener('mousedown', initDrag);
             elmnt.addEventListener('touchstart', initDrag, { passive: false });
 
@@ -839,7 +962,6 @@
                         match.rotation = parseFloat(elmnt.getAttribute('data-rotation')) || 0;
                         match.size = type === 'sticker' ? parseFloat(elmnt.querySelector('.asset-wrapper').style.fontSize) : parseInt(elmnt.style.width);
                         
-                        // Sync visual adjustments back to database text content layer
                         const txtArea = document.getElementById('diaryText').cloneNode(true);
                         txtArea.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
                         entries[currentEntryId].text = txtArea.innerHTML;
@@ -905,7 +1027,6 @@
             const dateStr = `${year}-${month}-${day}`;
             const uniqueId = dateStr + '_' + Date.now();
 
-            // Set up an explicit paragraph breaks block so the text engine caret behaves even with no words yet
             entries[uniqueId] = { 
                 text: "<p><br></p>", 
                 display_date: dateStr, 
@@ -929,7 +1050,6 @@
 
             document.getElementById('displayDate').innerText = formattedDate;
             
-            // Re-inject text content layer safely
             let rawContent = entries[idStr].text || '';
             if (rawContent.trim() === "") {
                 rawContent = "<p><br></p>";
@@ -940,10 +1060,9 @@
             document.getElementById('saveBtn').style.display = 'block';
             document.getElementById('deleteBtn').style.display = 'block';
 
-            // RE-BIND INTERACTION ENGINE TO ALL IMAGES/STICKERS LOADED ON REFRESH
             if (entries[idStr].canvasAssets) {
                 entries[idStr].canvasAssets.forEach(a => {
-                    createFloatingAssetElement(a.id, a.type, a.content, a.x, a.y, a.size, a.rotation);
+                    createFloatingAssetElement(a.id, a.type, a.content, a.x, a.y, a.size, a.rotation, a.frame || 'none');
                 });
             }
             renderEntryList();
@@ -952,7 +1071,6 @@
         function saveCurrentEntry() {
             if (!currentEntryId) return;
             
-            // Pull text elements strictly away from custom asset wrappers before parsing
             const textCleaner = document.getElementById('diaryText').cloneNode(true);
             textCleaner.querySelectorAll('.scrapbook-asset').forEach(h => h.remove());
             
