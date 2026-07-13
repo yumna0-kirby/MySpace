@@ -146,11 +146,11 @@
             border: 1px solid var(--border);
             border-radius: 20px;
             color: var(--text-main);
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             outline: none;
         }
 
-        .entry-list { flex: 1; overflow-y: auto; margin-bottom: 1rem; }
+        .entry-list { flex: 1; overflow-y: auto; margin-bottom: 0.5rem; }
         .entry-item {
             padding: 1rem;
             background: var(--bg-card);
@@ -158,6 +158,7 @@
             border-radius: 15px;
             margin-bottom: 0.75rem;
             cursor: pointer;
+            position: relative;
         }
         .entry-item.active { border-color: var(--accent-hover); background: rgba(255, 255, 255, 0.4); }
         .entry-item .date { font-size: 0.8rem; color: var(--accent-hover); font-weight: bold; }
@@ -183,7 +184,7 @@
             border: 1px solid var(--border);
             border-radius: 15px;
             padding: 0.75rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             font-size: 0.85rem;
             display: none;
         }
@@ -215,8 +216,8 @@
         .current-date { font-size: 1.1rem; font-style: italic; }
         .btn-group { display: flex; align-items: center; gap: 0.5rem; }
 
-        /* Theme Dropper */
-        .theme-selector select {
+        /* Theme & Template Droppers */
+        .theme-selector select, .template-selector select {
             padding: 0.4rem 0.8rem;
             border-radius: 20px;
             border: 1px solid var(--border);
@@ -270,6 +271,24 @@
         .btn-secondary { background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border); }
         .btn-danger { background-color: transparent; color: var(--danger); }
         .toggle-sidebar-btn { background-color: var(--bg-sidebar); border: 1px solid var(--border); color: var(--text-main); }
+
+        /* --- Goal Progress Bar --- */
+        .goal-container {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.05);
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            display: none;
+        }
+        .goal-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.2s ease, background-color 0.3s ease;
+        }
+        .goal-bar.complete { background: #87b396; }
 
         /* --- Text Editor Area --- */
         .editor-container {
@@ -363,6 +382,8 @@
             font-style: italic;
         }
 
+        .editor-input h3 { margin: 1rem 0 0.5rem 0; font-style: italic; color: var(--accent-hover); }
+
         .editor-input ul {
             list-style: none;
             padding-left: 1.5rem;
@@ -377,6 +398,28 @@
             position: absolute;
             left: -1.5rem;
             top: 0;
+        }
+
+        /* --- Tag Manager Tray --- */
+        .tag-tray {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            background: var(--bg-card);
+            border-top: 1px dashed var(--border);
+            flex-wrap: wrap;
+        }
+        .tag-tray span { font-size: 0.8rem; font-style: italic; color: var(--text-muted); }
+        .tag-input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-family: inherit;
+            flex: 1;
+            min-width: 100px;
         }
 
         /* Auto save indicator style */
@@ -426,6 +469,33 @@
         }
         .tray-sticker:active { transform: scale(1.2); }
 
+        /* --- Polaroid Gallery Wall View --- */
+        .gallery-view {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.5rem;
+            z-index: 4;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+        }
+        .polaroid-card {
+            background: white;
+            padding: 10px 10px 25px 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            text-align: center;
+        }
+        .polaroid-card:hover { transform: scale(1.04) rotate(2deg); }
+        .polaroid-card img { width: 100%; height: 130px; object-fit: cover; border: 1px solid #eee; margin-bottom: 8px; }
+        .polaroid-card .caption { font-size: 0.75rem; font-style: italic; color: var(--text-muted); }
+
         /* --- ADJUSTABLE ASSETS --- */
         .scrapbook-asset {
             position: absolute;
@@ -469,51 +539,16 @@
             pointer-events: none;
         }
 
-        /* --- CUTE CUSTOM FRAMES STYLES --- */
+        /* --- CUSTOM FRAME STYLES --- */
         .frame-none { }
-        
-        .frame-blossom {
-            border: 6px double #ffccd5 !important;
-            padding: 4px !important;
-            background: #fff0f2 !important;
-            border-radius: 12px !important;
-        }
-        
-        .frame-coquette {
-            border: 3px solid #ff8fa3 !important;
-            border-radius: 8px !important;
-            position: relative;
-        }
+        .frame-blossom { border: 6px double #ffccd5 !important; padding: 4px !important; background: #fff0f2 !important; border-radius: 12px !important; }
+        .frame-coquette { border: 3px solid #ff8fa3 !important; border-radius: 8px !important; position: relative; }
         .frame-coquette::before { content: '🎀'; position: absolute; top: -10px; left: -10px; font-size: 1.2rem; z-index: 10; }
         .frame-coquette::after { content: '🎀'; position: absolute; bottom: -10px; right: -10px; font-size: 1.2rem; z-index: 10; }
-
-        .frame-vintage {
-            background: #fdfaf7 !important;
-            padding: 8px 8px 32px 8px !important; 
-            border: 1px solid #e2d9cf !important;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.12) !important;
-            border-radius: 2px !important;
-        }
-
-        .frame-sparkle {
-            border: 3px dashed #fff3b0 !important;
-            padding: 6px !important;
-            box-shadow: 0 0 12px #fff3b0 !important;
-            border-radius: 14px !important;
-        }
-
-        .frame-gingham {
-            border: 8px solid #ffccd5 !important;
-            border-image: repeating-linear-gradient(45deg, #ffccd5, #ffccd5 10px, #ffffff 10px, #ffffff 20px) 10 !important;
-            padding: 4px !important;
-        }
-
-        .frame-clean {
-            border: 4px solid #ebd2b0 !important; 
-            padding: 2px !important;
-            border-radius: 0px !important;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.15) !important;
-        }
+        .frame-vintage { background: #fdfaf7 !important; padding: 8px 8px 32px 8px !important; border: 1px solid #e2d9cf !important; box-shadow: 0 6px 14px rgba(0,0,0,0.12) !important; border-radius: 2px !important; }
+        .frame-sparkle { border: 3px dashed #fff3b0 !important; padding: 6px !important; box-shadow: 0 0 12px #fff3b0 !important; border-radius: 14px !important; }
+        .frame-gingham { border: 8px solid #ffccd5 !important; border-image: repeating-linear-gradient(45deg, #ffccd5, #ffccd5 10px, #ffffff 10px, #ffffff 20px) 10 !important; padding: 4px !important; }
+        .frame-clean { border: 4px solid #ebd2b0 !important; padding: 2px !important; border-radius: 0px !important; box-shadow: 2px 2px 8px rgba(0,0,0,0.15) !important; }
 
         /* --- FRAME SELECT MODAL POPUP --- */
         .frame-popup {
@@ -529,15 +564,7 @@
             z-index: 2000; 
             top: 45px;
         }
-        .frame-opt {
-            padding: 0.4rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            text-align: center;
-            font-size: 0.8rem;
-            cursor: pointer;
-            background: var(--bg-main);
-        }
+        .frame-opt { padding: 0.4rem; border: 1px solid var(--border); border-radius: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; background: var(--bg-main); }
         .frame-opt:hover { background: var(--bg-sidebar); }
 
         /* --- CONTROL HANDLES --- */
@@ -558,52 +585,23 @@
             color: var(--text-main);
             user-select: none;
         }
-
-        .scrapbook-asset:hover .control-handle,
-        .scrapbook-asset:active .control-handle {
-            display: flex;
-        }
-
+        .scrapbook-asset:hover .control-handle, .scrapbook-asset:active .control-handle { display: flex; }
         .handle-delete { top: -12px; right: -12px; background: var(--danger); color: white; }
         .handle-resize { bottom: -12px; right: -12px; cursor: se-resize; background: #fff3b0; }
         .handle-rotate { top: -12px; left: -12px; cursor: grab; background: #c7f9cc; }
         .handle-frame { bottom: -12px; left: -12px; background: var(--bg-sidebar); cursor: pointer; font-size: 0.7rem; }
 
-        #imageInput { display: none; }
-        #importBackupInput { display: none; }
+        #imageInput, #importBackupInput { display: none; }
 
         /* --- RESPONSIVE LAYOUTS --- */
         @media (max-width: 850px) {
             body { position: relative; }
-            .sidebar { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                transform: translateX(-100%); 
-                width: 280px;
-                box-shadow: 5px 0 15px rgba(0,0,0,0.1);
-            }
+            .sidebar { position: absolute; left: 0; top: 0; transform: translateX(-100%); width: 280px; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
             .sidebar.open { transform: translateX(0); }
             .workspace-split { flex-direction: column; }
-            .scrapbook-sidebar { 
-                width: 100%; 
-                height: 85px; 
-                border-left: none; 
-                border-top: 1px dashed var(--border); 
-                padding: 0.5rem; 
-                flex-direction: row; 
-                align-items: center;
-                gap: 0.5rem;
-            }
+            .scrapbook-sidebar { width: 100%; height: 85px; border-left: none; border-top: 1px dashed var(--border); padding: 0.5rem; flex-direction: row; align-items: center; gap: 0.5rem; }
             .scrapbook-sidebar h4 { display: none; }
-            .sticker-grid { 
-                display: flex; 
-                flex-direction: row; 
-                overflow-x: auto; 
-                width: 100%; 
-                gap: 1rem; 
-                padding: 0 0.5rem;
-            }
+            .sticker-grid { display: flex; flex-direction: row; overflow-x: auto; width: 100%; gap: 1rem; padding: 0 0.5rem; }
             .tray-sticker { font-size: 2.2rem; }
         }
     </style></head><body>
@@ -619,9 +617,9 @@
     </div>
 
     <div class="sidebar" id="sidebar">
-        <h2>My Blooming Thoughts 🌸</h2>
-        <button class="btn-primary" style="margin-bottom: 1rem;" onclick="createNewEntry()">+ New Entry</button>
-        <input type="text" class="search-box" id="search" placeholder="Search memories..." oninput="renderEntryList()">
+        <h2 id="sidebarTitle">My Blooming Thoughts 🌸</h2>
+        <button class="btn-primary" id="newEntryBtn" style="margin-bottom: 0.5rem;" onclick="createNewEntry()">+ New Entry</button>
+        <input type="text" class="search-box" id="search" placeholder="Search memories or tags..." oninput="renderEntryList()">
         
         <div class="stats-panel" id="statsPanel">
             <div class="stats-title">Garden Statistics 📊</div>
@@ -633,6 +631,7 @@
 
         <div class="entry-list" id="entryList"></div>
         
+        <button class="btn-secondary" id="trashToggleBtn" style="margin-bottom: 0.5rem; font-size: 0.85rem;" onclick="toggleTrashFolder()">🗑️ View Trash Box</button>
         <div style="display: flex; gap: 0.5rem; width: 100%;">
             <button class="btn-secondary" style="flex: 1; font-size: 0.8rem; padding: 0.5rem;" onclick="exportBackup()">📥 Backup</button>
             <button class="btn-secondary" style="flex: 1; font-size: 0.8rem; padding: 0.5rem;" onclick="document.getElementById('importBackupInput').click()">📤 Import</button>
@@ -644,6 +643,7 @@
         <div class="toolbar">
             <div class="left-toolbar-group">
                 <button class="toggle-sidebar-btn" onclick="toggleSidebar()">📖 Journal</button>
+                <button class="btn-secondary" id="viewToggleBtn" style="min-height:40px;" onclick="toggleGalleryView()">🖼️ Gallery Wall</button>
                 <div class="current-date" id="displayDate">Select or Create an Entry</div>
                 <span class="autosave-status" id="autosaveStatus">Saved ✨</span>
                 
@@ -671,6 +671,12 @@
             </div>
         </div>
 
+        <div class="goal-container" id="goalContainer">
+            <div class="goal-bar" id="goalBar"></div>
+        </div>
+
+        <div class="gallery-view" id="galleryWallView"></div>
+
         <div class="editor-container" id="editorContainer" style="display: none;">
             <div class="editor-tools">
                 <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
@@ -682,6 +688,15 @@
                     <button class="tool-btn" onclick="insertCuteBullet('🎀')">🎀</button>
                     <button class="tool-btn" onclick="insertCuteBullet('⭐')">⭐</button>
                     <button class="tool-btn" onclick="insertCuteBullet('🧸')">🧸</button>
+                </div>
+
+                <div class="template-selector">
+                    <select id="templateSelect" onchange="injectTemplate(this.value); this.value='default';">
+                        <option value="default" disabled selected>🌱 Insert Template</option>
+                        <option value="gratitude">🙏 Gratitude Journal</option>
+                        <option value="reflection">💭 Daily Reflection</option>
+                        <option value="brain">🧠 Creative Brain Dump</option>
+                    </select>
                 </div>
 
                 <select class="tool-select" id="fontSelector" onchange="formatDoc('fontName', this.value)">
@@ -734,15 +749,24 @@
                     </div>
                 </div>
             </div>
+
+            <div class="tag-tray">
+                <span>Tags:</span>
+                <input type="text" class="tag-input" id="tagInputField" placeholder="Type tags separated by commas (e.g. #vent, #ideas)..." onblur="saveCurrentTags()" onkeydown="if(event.key==='Enter') saveCurrentTags()">
+            </div>
         </div>
     </div>
 
     <script>
         let entries = {};
+        let trashBox = {};
         let currentEntryId = null;
         let activeFrameAssetId = null; 
         let selectedMood = '😊';
-        let autoSaveTimer = null;
+        let isGalleryViewActive = false;
+        let isTrashFolderOpen = false;
+
+        const WORD_GOAL_TARGET = 200;
 
         window.addEventListener('DOMContentLoaded', () => {
             loadTheme();
@@ -751,11 +775,9 @@
                     document.getElementById('frameDropdown').style.display = 'none';
                 }
             });
-            // Setup Background Auto-saving
             startAutoSaveLoop();
         });
 
-        // --- Theme Selector Logic ---
         function changeTheme(themeName) {
             if (themeName === 'default') {
                 document.documentElement.removeAttribute('data-theme');
@@ -772,7 +794,6 @@
             changeTheme(savedTheme);
         }
 
-        // --- Mood Tracking Operations ---
         function setEntryMood(moodEmoji) {
             selectedMood = moodEmoji;
             document.querySelectorAll('.mood-selector-btn').forEach(btn => {
@@ -797,6 +818,7 @@
             }
 
             entries = JSON.parse(localStorage.getItem('private_floral_diary_entries')) || {};
+            trashBox = JSON.parse(localStorage.getItem('private_floral_diary_trash')) || {};
 
             const lockScreen = document.getElementById('lockScreen');
             lockScreen.style.opacity = '0';
@@ -821,34 +843,59 @@
             const listContainer = document.getElementById('entryList');
             listContainer.innerHTML = '';
 
-            const sortedKeys = Object.keys(entries).sort((a, b) => b.localeCompare(a));
+            const dataScope = isTrashFolderOpen ? trashBox : entries;
+            const sortedKeys = Object.keys(dataScope).sort((a, b) => b.localeCompare(a));
+
+            if(sortedKeys.length === 0) {
+                listContainer.innerHTML = `<div style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-top:2rem; font-style:italic;">No memories found here... 🍂</div>`;
+                return;
+            }
 
             sortedKeys.forEach(idStr => {
-                const entry = entries[idStr];
+                const entry = dataScope[idStr];
                 const cleanText = entry.text ? entry.text.replace(/<[^>]*>/g, '') : '';
+                const tagsStr = entry.tags ? entry.tags.join(' ').toLowerCase() : '';
                 
-                if (query && !entry.display_date.toLowerCase().includes(query) && !cleanText.toLowerCase().includes(query)) {
+                if (query && !entry.display_date.toLowerCase().includes(query) && !cleanText.toLowerCase().includes(query) && !tagsStr.includes(query)) {
                     return;
                 }
 
                 const item = document.createElement('div');
                 item.className = `entry-item ${currentEntryId === idStr ? 'active' : ''}`;
-                item.onclick = () => loadEntry(idStr);
-
-                const currentMood = entry.mood || '😊';
-
-                item.innerHTML = `
-                    <div class="date">${entry.display_date}</div>
-                    <div class="entry-meta-row">
-                        <span style="font-size:1.1rem; line-height:1;">${currentMood}</span>
+                
+                if (isTrashFolderOpen) {
+                    item.innerHTML = `
+                        <div class="date" style="color:var(--text-muted);">${entry.display_date} [Trash]</div>
                         <div class="preview">${cleanText || 'Empty memory...'}</div>
-                    </div>
-                `;
+                        <div style="margin-top:0.4rem; display:flex; gap:0.5rem;">
+                            <span style="font-size:0.75rem; text-decoration:underline; color:var(--accent-hover);" onclick="restoreFromTrash('${idStr}', event)">Restore</span>
+                            <span style="font-size:0.75rem; text-decoration:underline; color:var(--danger);" onclick="permanentlyWipeTrash('${idStr}', event)">Delete Forever</span>
+                        </div>
+                    `;
+                } else {
+                    const currentMood = entry.mood || '😊';
+                    let tagPills = '';
+                    if(entry.tags && entry.tags.length > 0) {
+                        tagPills = `<div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap;">` + 
+                            entry.tags.map(t => `<span style="font-size:0.7rem; background:rgba(0,0,0,0.04); padding:2px 6px; border-radius:10px; color:var(--text-muted);">${t}</span>`).join('') + `</div>`;
+                    }
+                    
+                    item.onclick = () => loadEntry(idStr);
+                    item.innerHTML = `
+                        <div class="date">${entry.display_date}</div>
+                        <div class="entry-meta-row">
+                            <span style="font-size:1.1rem; line-height:1;">${currentMood}</span>
+                            <div class="preview">${cleanText || 'Empty memory...'}</div>
+                        </div>
+                        ${tagPills}
+                    `;
+                }
                 listContainer.appendChild(item);
             });
         }
 
         function createNewEntry() {
+            if(isTrashFolderOpen) toggleTrashFolder(); // Flip view layer if inside trash box drawer
             const now = new Date();
             const idStr = 'entry_' + now.getTime();
             const displayDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -858,7 +905,8 @@
                 display_date: displayDate,
                 text: '',
                 mood: '😊',
-                assets: []
+                assets: [],
+                tags: []
             };
 
             localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
@@ -868,11 +916,13 @@
         }
 
         function loadEntry(idStr) {
+            if(isTrashFolderOpen) return;
             currentEntryId = idStr;
             const entry = entries[idStr];
             
             document.getElementById('displayDate').innerText = entry.display_date;
             document.getElementById('editorContainer').style.display = 'flex';
+            document.getElementById('goalContainer').style.display = 'block';
             document.getElementById('saveBtn').style.display = 'inline-flex';
             document.getElementById('deleteBtn').style.display = 'inline-flex';
             document.getElementById('moodPickerContainer').style.display = 'flex';
@@ -880,28 +930,27 @@
             const editor = document.getElementById('diaryText');
             editor.innerHTML = entry.text || '';
             
+            document.getElementById('tagInputField').value = entry.tags ? entry.tags.join(', ') : '';
             setEntryMood(entry.mood || '😊');
             
-            // Clean up old visual asset overlays
             document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
             
-            // Render loaded scrapbook assets if present
             if(entry.assets && Array.isArray(entry.assets)) {
                 entry.assets.forEach(asset => rebuildAssetOnWorkspace(asset));
             }
 
+            if(isGalleryViewActive) toggleGalleryView(); // Force close canvas overview walls cleanly
             renderEntryList();
             updateLiveStats();
         }
 
         function saveCurrentEntry(isSilent = false) {
-            if(!currentEntryId || !entries[currentEntryId]) return;
+            if(!currentEntryId || !entries[currentEntryId] || isTrashFolderOpen) return;
 
             const editor = document.getElementById('diaryText');
             entries[currentEntryId].text = editor.innerHTML;
             entries[currentEntryId].mood = selectedMood;
 
-            // Gather all asset adjustments live from workspace bounds
             const activeAssets = [];
             document.querySelectorAll('.scrapbook-asset').forEach(el => {
                 activeAssets.push({
@@ -927,31 +976,170 @@
             }
         }
 
+        // --- The Compost Bin (Trash Engine Logistics) ---
         function deleteCurrentEntry() {
-            if(!currentEntryId || !confirm("Are you sure you want to bury this memory forever? 🍂")) return;
-            delete entries[currentEntryId];
-            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
+            if(!currentEntryId || !entries[currentEntryId]) return;
+            if(!confirm("Move this memory to the Trash Box? 🍂")) return;
             
+            // Allocate record over to Trash stack bounds
+            trashBox[currentEntryId] = entries[currentEntryId];
+            delete entries[currentEntryId];
+            
+            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
+            localStorage.setItem('private_floral_diary_trash', JSON.stringify(trashBox));
+            
+            flushWorkspaceView();
+            renderEntryList();
+            calculateGardenStats();
+        }
+
+        function toggleTrashFolder() {
+            isTrashFolderOpen = !isTrashFolderOpen;
+            const btn = document.getElementById('trashToggleBtn');
+            const title = document.getElementById('sidebarTitle');
+            const nBtn = document.getElementById('newEntryBtn');
+
+            if(isTrashFolderOpen) {
+                btn.innerText = "🌸 View Live Journal";
+                title.innerText = "Withered Leaves 🍂";
+                nBtn.style.display = "none";
+                flushWorkspaceView();
+            } else {
+                btn.innerText = "🗑️ View Trash Box";
+                title.innerText = "My Blooming Thoughts 🌸";
+                nBtn.style.display = "inline-flex";
+            }
+            renderEntryList();
+        }
+
+        function restoreFromTrash(idStr, e) {
+            e.stopPropagation();
+            if(!trashBox[idStr]) return;
+            entries[idStr] = trashBox[idStr];
+            delete trashBox[idStr];
+            
+            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
+            localStorage.setItem('private_floral_diary_trash', JSON.stringify(trashBox));
+            renderEntryList();
+            calculateGardenStats();
+            alert("Memory restored safely back into your journal garden! 🌸");
+        }
+
+        function permanentlyWipeTrash(idStr, e) {
+            e.stopPropagation();
+            if(!confirm("Are you sure you want to shred this memory permanently? This cannot be undone. 🍂")) return;
+            delete trashBox[idStr];
+            localStorage.setItem('private_floral_diary_trash', JSON.stringify(trashBox));
+            renderEntryList();
+        }
+
+        function flushWorkspaceView() {
             currentEntryId = null;
             document.getElementById('editorContainer').style.display = 'none';
+            document.getElementById('goalContainer').style.display = 'none';
             document.getElementById('saveBtn').style.display = 'none';
             document.getElementById('deleteBtn').style.display = 'none';
             document.getElementById('moodPickerContainer').style.display = 'none';
             document.getElementById('displayDate').innerText = "Select or Create an Entry";
-            
             document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
+        }
+
+        // --- Tag Processing Traps ---
+        function saveCurrentTags() {
+            if(!currentEntryId || !entries[currentEntryId]) return;
+            const val = document.getElementById('tagInputField').value;
+            // Clean formats up into array matching structures
+            const tags = val.split(',')
+                            .map(t => t.trim().toLowerCase())
+                            .filter(t => t.length > 0)
+                            .map(t => t.startsWith('#') ? t : '#' + t);
+            entries[currentEntryId].tags = tags;
+            saveCurrentEntry(true);
             renderEntryList();
-            calculateGardenStats();
+        }
+
+        // --- Template Engine Injections ---
+        function injectTemplate(type) {
+            const editor = document.getElementById('diaryText');
+            let boilerplate = '';
+            
+            if(type === 'gratitude') {
+                boilerplate = `<h3>🙏 Gratitude Journal</h3><ul><li data-emoji="🌸">&nbsp;Three tiny things that brought a smile today:</li><li data-emoji="✨">&nbsp;</li><li data-emoji="✨">&nbsp;</li><li data-emoji="✨">&nbsp;</li></ul><h3>🧸 Someone I appreciated today:</h3><p></p>`;
+            } else if(type === 'reflection') {
+                boilerplate = `<h3>💭 Daily Reflection</h3><p><b>Current Mindset / Vibe:</b> </p><h3>⭐ Peak Moment of the day:</h3><p></p><h3>🍂 What felt heavy or cluttering:</h3><p></p>`;
+            } else if(type === 'brain') {
+                boilerplate = `<h3>🧠 Creative Brain Dump</h3><p><i>Unfiltered thoughts flow space...</i></p><ul><li data-emoji="🎨">&nbsp;Raw Idea Spark: </li><li data-emoji="⚡">&nbsp;Actionable tasks tomorrow: </li></ul>`;
+            }
+            
+            editor.innerHTML = editor.innerHTML + boilerplate;
+            updateLiveStats();
+            saveCurrentEntry(true);
+        }
+
+        // --- Polaroid Photo Gallery Board Wall System ---
+        function toggleGalleryView() {
+            isGalleryViewActive = !isGalleryViewActive;
+            const wall = document.getElementById('galleryWallView');
+            const editorCont = document.getElementById('editorContainer');
+            const goalCont = document.getElementById('goalContainer');
+            const toggleBtn = document.getElementById('viewToggleBtn');
+
+            if(isGalleryViewActive) {
+                toggleBtn.innerText = "📝 Write Mode";
+                editorCont.style.display = 'none';
+                goalCont.style.display = 'none';
+                wall.style.display = 'grid';
+                buildGalleryWall();
+            } else {
+                toggleBtn.innerText = "🖼️ Gallery Wall";
+                wall.style.display = 'none';
+                if(currentEntryId) {
+                    editorCont.style.display = 'flex';
+                    goalCont.style.display = 'block';
+                }
+            }
+        }
+
+        function buildGalleryWall() {
+            const wall = document.getElementById('galleryWallView');
+            wall.innerHTML = '';
+            let imageFoundCount = 0;
+
+            Object.keys(entries).forEach(idStr => {
+                const entry = entries[idStr];
+                if(entry.assets && Array.isArray(entry.assets)) {
+                    entry.assets.forEach(asset => {
+                        if(asset.type === 'photo') {
+                            imageFoundCount++;
+                            const card = document.createElement('div');
+                            card.className = 'polaroid-card';
+                            card.onclick = () => {
+                                toggleGalleryView(); // Re-toggle write view state layer loop closure
+                                loadEntry(idStr);
+                            };
+                            card.innerHTML = `
+                                <img src="${asset.content}">
+                                <div class="caption">🌸 ${entry.display_date}</div>
+                            `;
+                            wall.appendChild(card);
+                        }
+                    });
+                }
+            });
+
+            if(imageFoundCount === 0) {
+                wall.innerHTML = `<div style="grid-column: 1/-1; text-align:center; font-style:italic; color:var(--text-muted); padding:3rem;">Your garden's photo wall hasn't sprouted images yet. Drop photos into entries first! 🖼️</div>`;
+            }
         }
 
         // --- Auto Save Pipeline ---
         function startAutoSaveLoop() {
             setInterval(() => {
-                if(currentEntryId && document.getElementById('editorContainer').style.display === 'flex') {
+                if(currentEntryId && document.getElementById('editorContainer').style.display === 'flex' && !isTrashFolderOpen) {
                     saveCurrentEntry(true);
                     showAutosaveFlash();
                 }
-            }, 5000); // Triggers background sync every 5 seconds
+            }, 5000);
         }
 
         function showAutosaveFlash() {
@@ -964,9 +1152,6 @@
 
         // --- Markdown Typing Hotkeys ---
         function handleMarkdownAndShortcuts(e) {
-            const editor = document.getElementById('diaryText');
-            
-            // Intercept Markdown Heading transformation
             if(e.key === ' ' || e.keyCode === 32) {
                 const selection = window.getSelection();
                 if(selection.rangeCount > 0) {
@@ -990,18 +1175,26 @@
             }
         }
 
-        // --- Stats Analytics Calculation Engine ---
+        // --- Stats Analytics & Word Goal Progress Engine ---
         function updateLiveStats() {
             const text = document.getElementById('diaryText').innerText || '';
             const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-            document.getElementById('statWords').innerText = words;
+            
+            // Calculate and display progress bar steps
+            const bar = document.getElementById('goalBar');
+            const percentage = Math.min((words / WORD_GOAL_TARGET) * 100, 100);
+            bar.style.width = percentage + '%';
+            if(percentage >= 100) {
+                bar.classList.add('complete');
+            } else {
+                bar.classList.remove('complete');
+            }
         }
 
         function calculateGardenStats() {
             const totalKeys = Object.keys(entries);
             document.getElementById('statTotal').innerText = totalKeys.length;
             
-            // Word Count Total Aggregation
             let grandTotalWords = 0;
             const moodCounts = {};
             
@@ -1015,7 +1208,6 @@
             
             document.getElementById('statWords').innerText = grandTotalWords;
             
-            // Determine Peak Mood
             let topMood = '-';
             let maxCount = 0;
             for(let m in moodCounts) {
@@ -1025,16 +1217,12 @@
                 }
             }
             document.getElementById('statMood').innerText = topMood !== '-' ? `${topMood} (${maxCount})` : '-';
-            
-            // Streak Tracking calculation logic
             document.getElementById('statStreak').innerText = `${calculateStreak(totalKeys)} days`;
         }
 
         function calculateStreak(entryKeys) {
             if(entryKeys.length === 0) return 0;
-            // Parse and unique timestamps sorted descending
             const dates = entryKeys.map(k => {
-                const parts = entries[k].display_date.replace(',','').split(' ');
                 return new Date(entries[k].display_date).setHours(0,0,0,0);
             }).sort((a,b) => b - a);
             
@@ -1042,7 +1230,6 @@
             let streak = 0;
             let currentCheck = new Date().setHours(0,0,0,0);
             
-            // Fallback for skipping check if no log today yet
             if(uniqueDates[0] && uniqueDates[0] !== currentCheck && uniqueDates[0] === currentCheck - 86400000) {
                 currentCheck = uniqueDates[0];
             }
@@ -1050,7 +1237,7 @@
             for(let i=0; i<uniqueDates.length; i++) {
                 if(uniqueDates[i] === currentCheck) {
                     streak++;
-                    currentCheck -= 86400000; // Step back 1 day
+                    currentCheck -= 86400000;
                 } else {
                     break;
                 }
@@ -1067,7 +1254,6 @@
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
-                    // Force compress downscaling canvas step to optimize memory bounds
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 450;
                     let width = img.width;
@@ -1083,14 +1269,13 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Output web optimized base64 format string allocation
                     const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
                     spawnAsset('photo', compressedDataUrl);
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
-            e.target.value = ''; // Flush input track entry target safely
+            e.target.value = '';
         }
 
         // --- File Importer Migration ---
@@ -1177,7 +1362,6 @@
 
             asset.appendChild(wrapper);
 
-            // Add Control Handles
             const del = document.createElement('div');
             del.className = 'control-handle handle-delete';
             del.innerHTML = '✕';
@@ -1222,7 +1406,6 @@
             const asset = document.getElementById(activeFrameAssetId);
             if(asset) {
                 const wrapper = asset.querySelector('.asset-wrapper');
-                // Strip existing frame layout tags
                 wrapper.className = 'asset-wrapper';
                 asset.dataset.frameClass = 'frame-' + styleName;
                 if(styleName !== 'none') {
@@ -1234,7 +1417,7 @@
             activeFrameAssetId = null;
         }
 
-        // --- Interaction Transform Handlers ---
+        // --- Drag / Scale Interaction Mechanics ---
         function setupAssetDrag(el) {
             let startX, startY, initialLeft, initialTop;
             el.addEventListener('mousedown', dragStart);
@@ -1245,8 +1428,7 @@
                 e.preventDefault();
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                startX = clientX;
-                startY = clientY;
+                startX = clientX; startY = clientY;
                 initialLeft = parseInt(el.style.left) || 0;
                 initialTop = parseInt(el.style.top) || 0;
                 document.addEventListener('mousemove', dragMove);
