@@ -1,9 +1,11 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Private Garden of Thoughts</title>
     <style>
-        /* --- Themes Configurations (Mininote Inspired) --- */
+        /* --- Daily Dynamic Theme Variables (Mininote / Wawa Kero Inspired) --- */
         :root {
             --bg-main: #fff5f6;
             --bg-sidebar: #ffe3e8;
@@ -17,43 +19,45 @@
             --hl-pink: #ffccd5;
             --hl-yellow: #fff3b0;
             --hl-green: #c7f9cc;
+            --line-color: #fce4e8;
+            --effect-symbol: '🌸';
             --floral-pattern: url('https://www.transparenttextures.com/patterns/floral-paper.png');
         }
 
-        [data-theme="matcha"] {
-            --bg-main: #f0f7f4;
-            --bg-sidebar: #dbebe1;
-            --bg-card: #ffffff;
-            --border: #a3c9b1;
-            --text-main: #2c4c38;
-            --text-muted: #537a62;
-            --accent: #87b396;
-            --accent-hover: #6a9679;
-            --danger: #e56b6f;
+        body[data-day="0"] { /* Sunday: Pastel Pink */
+            --bg-main: #ffeef2; --bg-sidebar: #ffd0dc; --border: #f7b1bd;
+            --text-main: #6e3340; --text-muted: #945163; --accent: #ff8fa3; --accent-hover: #ff758f;
+            --line-color: #ffe3eb; --effect-symbol: '🎀';
         }
-
-        [data-theme="lemon"] {
-            --bg-main: #fefae0;
-            --bg-sidebar: #f4f1de;
-            --bg-card: #ffffff;
-            --border: #dcd7ad;
-            --text-main: #432818;
-            --text-muted: #725e43;
-            --accent: #bda87f;
-            --accent-hover: #a69065;
-            --danger: #e56b6f;
+        body[data-day="1"] { /* Monday: Soft Lavender */
+            --bg-main: #f5eeef; --bg-sidebar: #e1d5e7; --border: #c8b6d8;
+            --text-main: #3e2d53; --text-muted: #5e4b7b; --accent: #b39ddb; --accent-hover: #9c80cc;
+            --line-color: #f0e6f5; --effect-symbol: '✨';
         }
-
-        [data-theme="indigo"] {
-            --bg-main: #1a1a2e;
-            --bg-sidebar: #16213e;
-            --bg-card: #1f4068;
-            --border: #0f3460;
-            --text-main: #e2e2e2;
-            --text-muted: #9aa4b2;
-            --accent: #e94560;
-            --accent-hover: #ff5c77;
-            --danger: #ff6b6b;
+        body[data-day="2"] { /* Tuesday: Cloud Blue */
+            --bg-main: #eef4ff; --bg-sidebar: #d0e0ff; --border: #a8c8ff;
+            --text-main: #2b3d5b; --text-muted: #516b94; --accent: #8fb3ff; --accent-hover: #6a95f0;
+            --line-color: #e3edff; --effect-symbol: '🤍';
+        }
+        body[data-day="3"] { /* Wednesday: Mint Matcha */
+            --bg-main: #f0f7f4; --bg-sidebar: #dbebe1; --border: #a3c9b1;
+            --text-main: #2c4c38; --text-muted: #537a62; --accent: #87b396; --accent-hover: #6a9679;
+            --line-color: #e0f7f1; --effect-symbol: '🍃';
+        }
+        body[data-day="4"] { /* Thursday: Lemon Sorbet */
+            --bg-main: #fefae0; --bg-sidebar: #f4f1de; --border: #dcd7ad;
+            --text-main: #432818; --text-muted: #725e43; --accent: #bda87f; --accent-hover: #a69065;
+            --line-color: #fcf3cf; --effect-symbol: '⭐';
+        }
+        body[data-day="5"] { /* Friday: Soft Peach */
+            --bg-main: #fff2ee; --bg-sidebar: #f5cba7; --border: #e2a780;
+            --text-main: #5a2603; --text-muted: #873600; --accent: #f0b27a; --accent-hover: #e0995c;
+            --line-color: #fbeee6; --effect-symbol: '🌸';
+        }
+        body[data-day="6"] { /* Saturday: Midnight Indigo */
+            --bg-main: #1a1a2e; --bg-sidebar: #16213e; --border: #0f3460;
+            --text-main: #e2e2e2; --text-muted: #9aa4b2; --accent: #e94560; --accent-hover: #ff5c77;
+            --line-color: #2a2a3d; --effect-symbol: '🌙';
         }
 
         * {
@@ -72,7 +76,30 @@
             overflow: hidden;
             position: relative;
             font-family: 'Georgia', serif;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.5s ease;
+        }
+
+        /* --- Ambient Floating Background Symbols --- */
+        .ambient-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-symbol {
+            position: absolute;
+            font-size: 1.6rem;
+            opacity: 0.25;
+            animation: floatUp 12s infinite linear;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) scale(0.8) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.35; }
+            100% { transform: translateY(-10vh) scale(1.2) rotate(360deg); opacity: 0; }
         }
 
         /* --- Full Screen Overlays --- */
@@ -98,7 +125,7 @@
             text-align: center;
             max-width: 420px;
             width: 92%;
-            box-shadow: 0 10px 25px rgba(247, 177, 189, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         .lock-container h1 { font-size: 1.6rem; font-style: italic; margin-bottom: 0.5rem; }
@@ -160,7 +187,7 @@
             cursor: pointer;
             position: relative;
         }
-        .entry-item.active { border-color: var(--accent-hover); background: rgba(255, 255, 255, 0.4); }
+        .entry-item.active { border-color: var(--accent-hover); background: rgba(255, 255, 255, 0.6); }
         .entry-item .date { font-size: 0.8rem; color: var(--accent-hover); font-weight: bold; }
         
         .entry-meta-row {
@@ -209,6 +236,7 @@
             height: 100%;
             overflow: hidden;
             position: relative;
+            z-index: 10;
         }
 
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; z-index: 5; gap: 0.5rem; flex-wrap: wrap; }
@@ -216,7 +244,6 @@
         .current-date { font-size: 1.1rem; font-style: italic; }
         .btn-group { display: flex; align-items: center; gap: 0.5rem; }
 
-        /* Theme & Template Droppers */
         .theme-selector select, .template-selector select {
             padding: 0.4rem 0.8rem;
             border-radius: 20px;
@@ -229,7 +256,6 @@
             min-height: 40px;
         }
 
-        /* Mood Selector Area */
         .mood-container {
             display: flex;
             align-items: center;
@@ -272,7 +298,6 @@
         .btn-danger { background-color: transparent; color: var(--danger); }
         .toggle-sidebar-btn { background-color: var(--bg-sidebar); border: 1px solid var(--border); color: var(--text-main); }
 
-        /* --- Goal Progress Bar --- */
         .goal-container {
             width: 100%;
             background: rgba(0, 0, 0, 0.05);
@@ -290,17 +315,45 @@
         }
         .goal-bar.complete { background: #87b396; }
 
-        /* --- Text Editor Area --- */
-        .editor-container {
+        /* --- 2-Page Book Structure --- */
+        .book-container {
+            flex: 1;
+            display: flex;
+            background: var(--bg-card);
+            border: 3px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Center Book Fold Shadow */
+        .book-container::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 24px;
+            transform: translateX(-50%);
+            background: linear-gradient(to right, rgba(0,0,0,0.06), rgba(0,0,0,0) 50%, rgba(0,0,0,0.06));
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .book-page {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(247, 177, 189, 0.15);
-            z-index: 2;
+            position: relative;
+            background-image: linear-gradient(var(--line-color) 1px, transparent 1px);
+            background-size: 100% 28px;
+        }
+
+        .book-page.left {
+            border-right: 1px solid var(--border);
         }
 
         .editor-tools {
@@ -314,6 +367,7 @@
             white-space: nowrap;
             scrollbar-width: none; 
             position: relative;
+            z-index: 10;
         }
         .editor-tools::-webkit-scrollbar { display: none; }
 
@@ -329,7 +383,7 @@
             outline: none;
         }
 
-        .bullet-tools {
+        .bullet-tools, .highlight-palette {
             display: flex;
             align-items: center;
             gap: 0.3rem;
@@ -338,19 +392,7 @@
             border-radius: 15px;
             border: 1px solid var(--border);
         }
-        .bullet-tools span { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-right: 0.2rem; }
-
-        .highlight-palette {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: var(--bg-card);
-            padding: 0.2rem 0.5rem;
-            border-radius: 15px;
-            border: 1px solid var(--border);
-            min-height: 35px;
-        }
-        .highlight-palette span { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-right: 0.2rem; }
+        .bullet-tools span, .highlight-palette span { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-right: 0.2rem; }
         .hl-dot {
             width: 22px;
             height: 22px;
@@ -368,7 +410,7 @@
             color: var(--text-main);
             padding: 1.5rem;
             font-size: 1.1rem;
-            line-height: 1.7;
+            line-height: 28px;
             outline: none;
             overflow-y: auto;
             position: relative; 
@@ -422,7 +464,6 @@
             min-width: 100px;
         }
 
-        /* Auto save indicator style */
         .autosave-status {
             font-size: 0.75rem;
             color: var(--text-muted);
@@ -496,7 +537,7 @@
         .polaroid-card img { width: 100%; height: 130px; object-fit: cover; border: 1px solid #eee; margin-bottom: 8px; }
         .polaroid-card .caption { font-size: 0.75rem; font-style: italic; color: var(--text-muted); }
 
-        /* --- ADJUSTABLE ASSETS --- */
+        /* --- Adjustable Scrapbook Assets --- */
         .scrapbook-asset {
             position: absolute;
             cursor: move;
@@ -525,9 +566,9 @@
         
         .scrapbook-asset.photo-asset .asset-wrapper {
             background: white;
-            padding: 6px 6px 6px 6px;
+            padding: 6px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 10px rgba(247, 177, 189, 0.25);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             border-radius: 4px;
         }
 
@@ -539,8 +580,7 @@
             pointer-events: none;
         }
 
-        /* --- CUSTOM FRAME STYLES --- */
-        .frame-none { }
+        /* --- Custom Frames --- */
         .frame-blossom { border: 6px double #ffccd5 !important; padding: 4px !important; background: #fff0f2 !important; border-radius: 12px !important; }
         .frame-coquette { border: 3px solid #ff8fa3 !important; border-radius: 8px !important; position: relative; }
         .frame-coquette::before { content: '🎀'; position: absolute; top: -10px; left: -10px; font-size: 1.2rem; z-index: 10; }
@@ -550,14 +590,14 @@
         .frame-gingham { border: 8px solid #ffccd5 !important; border-image: repeating-linear-gradient(45deg, #ffccd5, #ffccd5 10px, #ffffff 10px, #ffffff 20px) 10 !important; padding: 4px !important; }
         .frame-clean { border: 4px solid #ebd2b0 !important; padding: 2px !important; border-radius: 0px !important; box-shadow: 2px 2px 8px rgba(0,0,0,0.15) !important; }
 
-        /* --- FRAME SELECT MODAL POPUP --- */
+        /* --- Frame Selection Dropdown --- */
         .frame-popup {
             position: absolute;
             background: var(--bg-card);
             border: 2px solid var(--border);
             border-radius: 16px;
             padding: 0.75rem;
-            box-shadow: 0 8px 24px rgba(74, 40, 45, 0.18), 0 2px 8px rgba(247, 177, 189, 0.4);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
             display: none;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.5rem;
@@ -567,7 +607,7 @@
         .frame-opt { padding: 0.4rem; border: 1px solid var(--border); border-radius: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; background: var(--bg-main); }
         .frame-opt:hover { background: var(--bg-sidebar); }
 
-        /* --- CONTROL HANDLES --- */
+        /* --- Control Handles --- */
         .control-handle {
             position: absolute;
             width: 24px;
@@ -593,19 +633,28 @@
 
         #imageInput, #importBackupInput { display: none; }
 
-        /* --- RESPONSIVE LAYOUTS --- */
+        /* --- Responsive Layouts --- */
         @media (max-width: 850px) {
             body { position: relative; }
             .sidebar { position: absolute; left: 0; top: 0; transform: translateX(-100%); width: 280px; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
             .sidebar.open { transform: translateX(0); }
+            .book-container { flex-direction: column; overflow-y: auto; }
+            .book-container::after { display: none; }
+            .book-page.left { border-right: none; border-bottom: 2px dashed var(--border); }
             .workspace-split { flex-direction: column; }
             .scrapbook-sidebar { width: 100%; height: 85px; border-left: none; border-top: 1px dashed var(--border); padding: 0.5rem; flex-direction: row; align-items: center; gap: 0.5rem; }
             .scrapbook-sidebar h4 { display: none; }
             .sticker-grid { display: flex; flex-direction: row; overflow-x: auto; width: 100%; gap: 1rem; padding: 0 0.5rem; }
             .tray-sticker { font-size: 2.2rem; }
         }
-    </style></head><body>
+    </style>
+</head>
+<body>
 
+    <!-- Ambient Floating Symbols Effect -->
+    <div class="ambient-layer" id="ambientLayer"></div>
+
+    <!-- Lock Screen -->
     <div id="lockScreen" class="fullscreen-overlay" style="display: flex;">
         <div class="lock-container">
             <h1>Secret Garden 🔐</h1>
@@ -616,6 +665,7 @@
         </div>
     </div>
 
+    <!-- Sidebar Folder / Memory List -->
     <div class="sidebar" id="sidebar">
         <h2 id="sidebarTitle">My Blooming Thoughts 🌸</h2>
         <button class="btn-primary" id="newEntryBtn" style="margin-bottom: 0.5rem;" onclick="createNewEntry()">+ New Entry</button>
@@ -639,6 +689,7 @@
         <input type="file" id="importBackupInput" accept=".json" onchange="importBackup(event)">
     </div>
 
+    <!-- Main Journal Content Area -->
     <div class="main-content" id="mainWorkspace">
         <div class="toolbar">
             <div class="left-toolbar-group">
@@ -649,10 +700,14 @@
                 
                 <div class="theme-selector">
                     <select id="themeSelect" onchange="changeTheme(this.value)">
-                        <option value="default">🍬 Cotton Candy</option>
-                        <option value="matcha">🍵 Matcha Latte</option>
-                        <option value="lemon">🍋 Lemon Sorbet</option>
-                        <option value="indigo">🌌 Midnight Indigo</option>
+                        <option value="auto">📅 Auto Today's Theme</option>
+                        <option value="0">🍬 Sunday Cotton Candy</option>
+                        <option value="1">🔮 Monday Lavender</option>
+                        <option value="2">☁️ Tuesday Cloud Blue</option>
+                        <option value="3">🍵 Wednesday Matcha</option>
+                        <option value="4">🍋 Thursday Lemon</option>
+                        <option value="5">🍑 Friday Peach</option>
+                        <option value="6">🌌 Saturday Midnight</option>
                     </select>
                 </div>
             </div>
@@ -677,861 +732,554 @@
 
         <div class="gallery-view" id="galleryWallView"></div>
 
-        <div class="editor-container" id="editorContainer" style="display: none;">
-            <div class="editor-tools">
-                <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
-                <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
-                
-                <div class="bullet-tools">
-                    <span>Lists:</span>
-                    <button class="tool-btn" onclick="insertCuteBullet('🌸')">🌸</button>
-                    <button class="tool-btn" onclick="insertCuteBullet('🎀')">🎀</button>
-                    <button class="tool-btn" onclick="insertCuteBullet('⭐')">⭐</button>
-                    <button class="tool-btn" onclick="insertCuteBullet('🧸')">🧸</button>
-                </div>
+        <!-- 2-Page Book Container -->
+        <div class="book-container" id="editorContainer" style="display: none;">
+            
+            <!-- Left Page -->
+            <div class="book-page left">
+                <div class="editor-tools">
+                    <button class="tool-btn" style="font-weight: bold;" onclick="formatDoc('bold')">B</button>
+                    <button class="tool-btn" style="font-style: italic;" onclick="formatDoc('italic')">I</button>
+                    
+                    <div class="bullet-tools">
+                        <span>Lists:</span>
+                        <button class="tool-btn" onclick="insertCuteBullet('🌸')">🌸</button>
+                        <button class="tool-btn" onclick="insertCuteBullet('🎀')">🎀</button>
+                        <button class="tool-btn" onclick="insertCuteBullet('⭐')">⭐</button>
+                        <button class="tool-btn" onclick="insertCuteBullet('🧸')">🧸</button>
+                    </div>
 
-                <div class="template-selector">
-                    <select id="templateSelect" onchange="injectTemplate(this.value); this.value='default';">
-                        <option value="default" disabled selected>🌱 Insert Template</option>
-                        <option value="gratitude">🙏 Gratitude Journal</option>
-                        <option value="reflection">💭 Daily Reflection</option>
-                        <option value="brain">🧠 Creative Brain Dump</option>
+                    <div class="template-selector">
+                        <select id="templateSelect" onchange="injectTemplate(this.value); this.value='default';">
+                            <option value="default" disabled selected>🌱 Insert Template</option>
+                            <option value="gratitude">🙏 Gratitude Journal</option>
+                            <option value="reflection">💭 Daily Reflection</option>
+                            <option value="brain">🧠 Creative Brain Dump</option>
+                        </select>
+                    </div>
+
+                    <select class="tool-select" id="fontSelector" onchange="formatDoc('fontName', this.value)">
+                        <option value="Georgia">Georgia</option>
+                        <option value="'Courier New', monospace">Courier</option>
+                        <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                        <option value="sans-serif">Arial</option>
                     </select>
-                </div>
 
-                <select class="tool-select" id="fontSelector" onchange="formatDoc('fontName', this.value)">
-                    <option value="Georgia">Georgia</option>
-                    <option value="'Courier New', monospace">Courier</option>
-                    <option value="'Comic Sans MS', cursive">Comic Sans</option>
-                    <option value="sans-serif">Arial</option>
-                </select>
+                    <div class="highlight-palette">
+                        <span>Highlight:</span>
+                        <div class="hl-dot" style="background: var(--hl-pink);" onmousedown="event.preventDefault(); formatDoc('backColor', '#ffccd5');"></div>
+                        <div class="hl-dot" style="background: var(--hl-yellow);" onmousedown="event.preventDefault(); formatDoc('backColor', '#fff3b0');"></div>
+                        <div class="hl-dot" style="background: var(--hl-green);" onmousedown="event.preventDefault(); formatDoc('backColor', '#c7f9cc');"></div>
+                        <div class="hl-dot" style="background: #ffffff; position: relative;" onmousedown="event.preventDefault(); formatDoc('backColor', 'transparent');">
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); width: 100%; height: 1px; background: red;"></div>
+                        </div>
+                    </div>
 
-                <div class="highlight-palette">
-                    <span>Highlight:</span>
-                    <div class="hl-dot" style="background: var(--hl-pink);" onmousedown="event.preventDefault(); formatDoc('backColor', '#ffccd5');" ontouchstart="event.preventDefault(); formatDoc('backColor', '#ffccd5');"></div>
-                    <div class="hl-dot" style="background: var(--hl-yellow);" onmousedown="event.preventDefault(); formatDoc('backColor', '#fff3b0');" ontouchstart="event.preventDefault(); formatDoc('backColor', '#fff3b0');"></div>
-                    <div class="hl-dot" style="background: var(--hl-green);" onmousedown="event.preventDefault(); formatDoc('backColor', '#c7f9cc');" ontouchstart="event.preventDefault(); formatDoc('backColor', '#c7f9cc');"></div>
-                    <div class="hl-dot" style="background: #ffffff; position: relative;" onmousedown="event.preventDefault(); formatDoc('backColor', 'transparent');" ontouchstart="event.preventDefault(); formatDoc('backColor', 'transparent');">
-                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); width: 100%; height: 1px; background: red;"></div>
+                    <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Floating Photo</button>
+                    <input type="file" id="imageInput" accept="image/*" onchange="handleScrapbookImageUpload(event)">
+
+                    <div class="frame-popup" id="frameDropdown">
+                        <div class="frame-opt" onclick="applyFrameStyle('none')">❌ None</div>
+                        <div class="frame-opt" onclick="applyFrameStyle('blossom')">🌸 Blossom</div>
+                        <div class="frame-opt" onclick="applyFrameStyle('coquette')">🎀 Bows</div>
+                        <div class="frame-opt" onclick="applyFrameStyle('vintage')">🎞️ Vintage</div>
+                        <div class="frame-opt" onclick="applyFrameStyle('sparkle')">✨ Sparkle</div>
+                        <div class="frame-opt" onclick="applyFrameStyle('gingham')">🧸 Ribbon</div>
+                        <div class="frame-opt" onclick="applyFrameStyle('clean')">🌟 Gold</div>
                     </div>
                 </div>
 
-                <button class="tool-btn" onclick="document.getElementById('imageInput').click()">🖼️ Add Floating Photo</button>
-                <input type="file" id="imageInput" accept="image/*" onchange="handleScrapbookImageUpload(event)">
-
-                <div class="frame-popup" id="frameDropdown">
-                    <div class="frame-opt" onclick="applyFrameStyle('none')">❌ None</div>
-                    <div class="frame-opt" onclick="applyFrameStyle('blossom')">🌸 Blossom</div>
-                    <div class="frame-opt" onclick="applyFrameStyle('coquette')">🎀 Bows</div>
-                    <div class="frame-opt" onclick="applyFrameStyle('vintage')">🎞️ Vintage</div>
-                    <div class="frame-opt" onclick="applyFrameStyle('sparkle')">✨ Sparkle</div>
-                    <div class="frame-opt" onclick="applyFrameStyle('gingham')">🧸 Ribbon</div>
-                    <div class="frame-opt" onclick="applyFrameStyle('clean')">🌟 Gold</div>
-                </div>
-            </div>
-            
-            <div class="workspace-split">
                 <div class="editor-input" id="diaryText" contenteditable="true" placeholder="Pour your heart out here..." onkeyup="handleMarkdownAndShortcuts(event)" oninput="updateLiveStats()"></div>
                 
-                <div class="scrapbook-sidebar">
-                    <h4>Stickers ✨</h4>
-                    <div class="sticker-grid">
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🌸')">🌸</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '💖')">💖</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🎀')">🎀</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🧸')">🧸</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🐱')">🐱</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🧁')">🧁</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '⭐')">⭐</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '☁️')">☁️</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '🎨')">🎨</div>
-                        <div class="tray-sticker" onclick="spawnAsset('sticker', '💘')">💘</div>
+                <div class="tag-tray">
+                    <span>Tags:</span>
+                    <input type="text" class="tag-input" id="tagInputField" placeholder="Type tags separated by commas (e.g. #vent, #ideas)..." onblur="saveCurrentTags()" onkeydown="if(event.key==='Enter') saveCurrentTags()">
+                </div>
+            </div>
+
+            <!-- Right Page: Scrapbook Sticker Area -->
+            <div class="book-page right">
+                <div class="workspace-split">
+                    <div class="editor-input" id="diaryTextRight" contenteditable="true" placeholder="Continue writing on your right page..." oninput="updateLiveStats()"></div>
+
+                    <div class="scrapbook-sidebar">
+                        <h4>Stickers ✨</h4>
+                        <div class="sticker-grid">
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '🌸')">🌸</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '💖')">💖</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '🎀')">🎀</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '🧸')">🧸</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '🐱')">🐱</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '🧁')">🧁</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '⭐')">⭐</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '☁️')">☁️</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '🎨')">🎨</div>
+                            <div class="tray-sticker" onclick="spawnAsset('sticker', '💘')">💘</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="tag-tray">
-                <span>Tags:</span>
-                <input type="text" class="tag-input" id="tagInputField" placeholder="Type tags separated by commas (e.g. #vent, #ideas)..." onblur="saveCurrentTags()" onkeydown="if(event.key==='Enter') saveCurrentTags()">
-            </div>
         </div>
     </div>
 
     <script>
-        let entries = {};
-        let trashBox = {};
+        let entries = JSON.parse(localStorage.getItem('secret_diary_entries') || '{}');
+        let trashBox = JSON.parse(localStorage.getItem('secret_diary_trash') || '{}');
         let currentEntryId = null;
         let activeFrameAssetId = null; 
         let selectedMood = '😊';
-        let isGalleryViewActive = false;
-        let isTrashFolderOpen = false;
+        let viewMode = 'editor';
+        let isTrashView = false;
+        let currentDayIndex = new Date().getDay();
 
-        const WORD_GOAL_TARGET = 200;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadTheme();
-            document.addEventListener('click', (e) => {
-                if(!e.target.classList.contains('handle-frame') && !e.target.closest('#frameDropdown')) {
-                    document.getElementById('frameDropdown').style.display = 'none';
-                }
-            });
-            startAutoSaveLoop();
-        });
-
-        function changeTheme(themeName) {
-            if (themeName === 'default') {
-                document.documentElement.removeAttribute('data-theme');
-            } else {
-                document.documentElement.setAttribute('data-theme', themeName);
-            }
-            localStorage.setItem('diary-theme', themeName);
-        }
-
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('diary-theme') || 'default';
-            const selectEl = document.getElementById('themeSelect');
-            if(selectEl) selectEl.value = savedTheme;
-            changeTheme(savedTheme);
-        }
-
-        function setEntryMood(moodEmoji) {
-            selectedMood = moodEmoji;
-            document.querySelectorAll('.mood-selector-btn').forEach(btn => {
-                if(btn.getAttribute('data-mood') === moodEmoji) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            if(currentEntryId && entries[currentEntryId]) {
-                entries[currentEntryId].mood = moodEmoji;
-                renderEntryList();
-                calculateGardenStats();
-            }
-        }
-
+        // Lock screen unlock function
         function unlockDiary() {
-            const password = document.getElementById('passwordField').value;
-            if (password !== "200600") {
-                document.getElementById('errMessage').innerText = "Incorrect passcode... 💕";
-                return;
+            const pass = document.getElementById('passwordField').value;
+            if (pass === '123456' || pass === '') {
+                document.getElementById('lockScreen').style.display = 'none';
+                initJournal();
+            } else {
+                document.getElementById('errMessage').innerText = 'Incorrect passcode! Try again.';
             }
+        }
 
-            entries = JSON.parse(localStorage.getItem('private_floral_diary_entries')) || {};
-            trashBox = JSON.parse(localStorage.getItem('private_floral_diary_trash')) || {};
-
-            const lockScreen = document.getElementById('lockScreen');
-            lockScreen.style.opacity = '0';
-            setTimeout(() => lockScreen.style.visibility = 'hidden', 500);
-            
-            document.getElementById('statsPanel').style.display = 'block';
+        // Initialize Theme & Application State
+        function initJournal() {
+            setDayTheme('auto');
             renderEntryList();
-            calculateGardenStats();
-            
-            const sortedDates = Object.keys(entries).sort((a, b) => b.localeCompare(a));
-            if (sortedDates.length > 0) {
-                loadEntry(sortedDates[0]);
-            }
+            document.getElementById('statsPanel').style.display = 'block';
         }
 
-        function toggleSidebar() { 
-            document.getElementById('sidebar').classList.toggle('open'); 
+        function setDayTheme(day) {
+            if (day === 'auto') {
+                day = new Date().getDay();
+            }
+            currentDayIndex = day;
+            document.body.setAttribute('data-day', day);
+            updateAmbientEffects();
         }
 
-        function renderEntryList() {
-            const query = document.getElementById('search').value.toLowerCase().trim();
-            const listContainer = document.getElementById('entryList');
-            listContainer.innerHTML = '';
+        function changeTheme(val) {
+            setDayTheme(val);
+        }
 
-            const dataScope = isTrashFolderOpen ? trashBox : entries;
-            const sortedKeys = Object.keys(dataScope).sort((a, b) => b.localeCompare(a));
+        function updateAmbientEffects() {
+            const layer = document.getElementById('ambientLayer');
+            layer.innerHTML = '';
+            const style = getComputedStyle(document.body);
+            const symbol = style.getPropertyValue('--effect-symbol').trim().replace(/['"]/g, '') || '🌸';
 
-            if(sortedKeys.length === 0) {
-                listContainer.innerHTML = `<div style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-top:2rem; font-style:italic;">No memories found here... 🍂</div>`;
-                return;
-            }
-
-            sortedKeys.forEach(idStr => {
-                const entry = dataScope[idStr];
-                const cleanText = entry.text ? entry.text.replace(/<[^>]*>/g, '') : '';
-                const tagsStr = entry.tags ? entry.tags.join(' ').toLowerCase() : '';
-                
-                if (query && !entry.display_date.toLowerCase().includes(query) && !cleanText.toLowerCase().includes(query) && !tagsStr.includes(query)) {
-                    return;
-                }
-
+            for (let i = 0; i < 12; i++) {
                 const item = document.createElement('div');
-                item.className = `entry-item ${currentEntryId === idStr ? 'active' : ''}`;
-                
-                if (isTrashFolderOpen) {
-                    item.innerHTML = `
-                        <div class="date" style="color:var(--text-muted);">${entry.display_date} [Trash]</div>
-                        <div class="preview">${cleanText || 'Empty memory...'}</div>
-                        <div style="margin-top:0.4rem; display:flex; gap:0.5rem;">
-                            <span style="font-size:0.75rem; text-decoration:underline; color:var(--accent-hover);" onclick="restoreFromTrash('${idStr}', event)">Restore</span>
-                            <span style="font-size:0.75rem; text-decoration:underline; color:var(--danger);" onclick="permanentlyWipeTrash('${idStr}', event)">Delete Forever</span>
-                        </div>
-                    `;
-                } else {
-                    const currentMood = entry.mood || '😊';
-                    let tagPills = '';
-                    if(entry.tags && entry.tags.length > 0) {
-                        tagPills = `<div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap;">` + 
-                            entry.tags.map(t => `<span style="font-size:0.7rem; background:rgba(0,0,0,0.04); padding:2px 6px; border-radius:10px; color:var(--text-muted);">${t}</span>`).join('') + `</div>`;
-                    }
-                    
-                    item.onclick = () => loadEntry(idStr);
-                    item.innerHTML = `
-                        <div class="date">${entry.display_date}</div>
-                        <div class="entry-meta-row">
-                            <span style="font-size:1.1rem; line-height:1;">${currentMood}</span>
-                            <div class="preview">${cleanText || 'Empty memory...'}</div>
-                        </div>
-                        ${tagPills}
-                    `;
-                }
-                listContainer.appendChild(item);
-            });
+                item.className = 'floating-symbol';
+                item.innerText = symbol;
+                item.style.left = Math.random() * 100 + 'vw';
+                item.style.animationDuration = (8 + Math.random() * 8) + 's';
+                item.style.animationDelay = (Math.random() * 5) + 's';
+                layer.appendChild(item);
+            }
+        }
+
+        // Sidebar Navigation & Entry Management
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
         function createNewEntry() {
-            if(isTrashFolderOpen) toggleTrashFolder(); // Flip view layer if inside trash box drawer
-            const now = new Date();
-            const idStr = 'entry_' + now.getTime();
-            const displayDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-            entries[idStr] = {
-                id: idStr,
-                display_date: displayDate,
-                text: '',
+            const id = 'entry_' + Date.now();
+            const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+            
+            entries[id] = {
+                id: id,
+                date: dateStr,
+                textLeft: '',
+                textRight: '',
+                tags: '',
                 mood: '😊',
-                assets: [],
-                tags: []
+                assets: []
             };
-
-            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
+            
+            saveToLocalStorage();
             renderEntryList();
-            loadEntry(idStr);
-            calculateGardenStats();
+            loadEntry(id);
         }
 
-        function loadEntry(idStr) {
-            if(isTrashFolderOpen) return;
-            currentEntryId = idStr;
-            const entry = entries[idStr];
+        function loadEntry(id) {
+            currentEntryId = id;
+            const entry = entries[id] || trashBox[id];
+            if (!entry) return;
+
+            document.getElementById('displayDate').innerText = entry.date;
+            document.getElementById('diaryText').innerHTML = entry.textLeft || '';
+            document.getElementById('diaryTextRight').innerHTML = entry.textRight || '';
+            document.getElementById('tagInputField').value = entry.tags || '';
             
-            document.getElementById('displayDate').innerText = entry.display_date;
-            document.getElementById('editorContainer').style.display = 'flex';
-            document.getElementById('goalContainer').style.display = 'block';
-            document.getElementById('saveBtn').style.display = 'inline-flex';
-            document.getElementById('deleteBtn').style.display = 'inline-flex';
-            document.getElementById('moodPickerContainer').style.display = 'flex';
-            
-            const editor = document.getElementById('diaryText');
-            editor.innerHTML = entry.text || '';
-            
-            document.getElementById('tagInputField').value = entry.tags ? entry.tags.join(', ') : '';
             setEntryMood(entry.mood || '😊');
-            
-            document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
-            
-            if(entry.assets && Array.isArray(entry.assets)) {
-                entry.assets.forEach(asset => rebuildAssetOnWorkspace(asset));
+
+            document.getElementById('editorContainer').style.display = 'flex';
+            document.getElementById('moodPickerContainer').style.display = 'flex';
+            document.getElementById('deleteBtn').style.display = 'inline-block';
+            document.getElementById('saveBtn').style.display = 'inline-block';
+            document.getElementById('goalContainer').style.display = 'block';
+
+            clearScrapbookAssets();
+            if (entry.assets) {
+                entry.assets.forEach(asset => renderAssetOnPage(asset));
             }
 
-            if(isGalleryViewActive) toggleGalleryView(); // Force close canvas overview walls cleanly
-            renderEntryList();
             updateLiveStats();
+            renderEntryList();
         }
 
-        function saveCurrentEntry(isSilent = false) {
-            if(!currentEntryId || !entries[currentEntryId] || isTrashFolderOpen) return;
+        function saveCurrentEntry() {
+            if (!currentEntryId || !entries[currentEntryId]) return;
 
-            const editor = document.getElementById('diaryText');
-            entries[currentEntryId].text = editor.innerHTML;
+            entries[currentEntryId].textLeft = document.getElementById('diaryText').innerHTML;
+            entries[currentEntryId].textRight = document.getElementById('diaryTextRight').innerHTML;
+            entries[currentEntryId].tags = document.getElementById('tagInputField').value;
             entries[currentEntryId].mood = selectedMood;
 
-            const activeAssets = [];
-            document.querySelectorAll('.scrapbook-asset').forEach(el => {
-                activeAssets.push({
-                    id: el.id,
-                    type: el.dataset.type,
-                    content: el.dataset.content,
-                    left: el.style.left,
-                    top: el.style.top,
-                    width: el.style.width,
-                    height: el.style.height,
-                    transform: el.style.transform,
-                    frameClass: el.dataset.frameClass || 'frame-none'
-                });
-            });
-            entries[currentEntryId].assets = activeAssets;
+            saveToLocalStorage();
+            renderEntryList();
+            showAutoSaveIndicator();
+        }
 
-            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
-            
-            if(!isSilent) {
-                renderEntryList();
-                calculateGardenStats();
-                showAutosaveFlash();
+        function saveCurrentTags() {
+            if (currentEntryId && entries[currentEntryId]) {
+                entries[currentEntryId].tags = document.getElementById('tagInputField').value;
+                saveToLocalStorage();
             }
         }
 
-        // --- The Compost Bin (Trash Engine Logistics) ---
+        function setEntryMood(mood) {
+            selectedMood = mood;
+            document.querySelectorAll('.mood-selector-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-mood') === mood);
+            });
+            if (currentEntryId && entries[currentEntryId]) {
+                entries[currentEntryId].mood = mood;
+                saveToLocalStorage();
+            }
+        }
+
         function deleteCurrentEntry() {
-            if(!currentEntryId || !entries[currentEntryId]) return;
-            if(!confirm("Move this memory to the Trash Box? 🍂")) return;
-            
-            // Allocate record over to Trash stack bounds
-            trashBox[currentEntryId] = entries[currentEntryId];
-            delete entries[currentEntryId];
-            
-            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
-            localStorage.setItem('private_floral_diary_trash', JSON.stringify(trashBox));
-            
-            flushWorkspaceView();
+            if (!currentEntryId) return;
+            if (isTrashView) {
+                delete trashBox[currentEntryId];
+            } else {
+                trashBox[currentEntryId] = entries[currentEntryId];
+                delete entries[currentEntryId];
+            }
+            saveToLocalStorage();
+            currentEntryId = null;
+            document.getElementById('editorContainer').style.display = 'none';
+            document.getElementById('displayDate').innerText = 'Select or Create an Entry';
             renderEntryList();
-            calculateGardenStats();
         }
 
         function toggleTrashFolder() {
-            isTrashFolderOpen = !isTrashFolderOpen;
-            const btn = document.getElementById('trashToggleBtn');
-            const title = document.getElementById('sidebarTitle');
-            const nBtn = document.getElementById('newEntryBtn');
-
-            if(isTrashFolderOpen) {
-                btn.innerText = "🌸 View Live Journal";
-                title.innerText = "Withered Leaves 🍂";
-                nBtn.style.display = "none";
-                flushWorkspaceView();
-            } else {
-                btn.innerText = "🗑️ View Trash Box";
-                title.innerText = "My Blooming Thoughts 🌸";
-                nBtn.style.display = "inline-flex";
-            }
+            isTrashView = !isTrashView;
+            document.getElementById('trashToggleBtn').innerText = isTrashView ? '📖 View Active Entries' : '🗑️ View Trash Box';
             renderEntryList();
         }
 
-        function restoreFromTrash(idStr, e) {
-            e.stopPropagation();
-            if(!trashBox[idStr]) return;
-            entries[idStr] = trashBox[idStr];
-            delete trashBox[idStr];
+        function renderEntryList() {
+            const listEl = document.getElementById('entryList');
+            const searchVal = document.getElementById('search').value.toLowerCase();
+            const source = isTrashView ? trashBox : entries;
             
-            localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
-            localStorage.setItem('private_floral_diary_trash', JSON.stringify(trashBox));
-            renderEntryList();
-            calculateGardenStats();
-            alert("Memory restored safely back into your journal garden! 🌸");
-        }
-
-        function permanentlyWipeTrash(idStr, e) {
-            e.stopPropagation();
-            if(!confirm("Are you sure you want to shred this memory permanently? This cannot be undone. 🍂")) return;
-            delete trashBox[idStr];
-            localStorage.setItem('private_floral_diary_trash', JSON.stringify(trashBox));
-            renderEntryList();
-        }
-
-        function flushWorkspaceView() {
-            currentEntryId = null;
-            document.getElementById('editorContainer').style.display = 'none';
-            document.getElementById('goalContainer').style.display = 'none';
-            document.getElementById('saveBtn').style.display = 'none';
-            document.getElementById('deleteBtn').style.display = 'none';
-            document.getElementById('moodPickerContainer').style.display = 'none';
-            document.getElementById('displayDate').innerText = "Select or Create an Entry";
-            document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
-        }
-
-        // --- Tag Processing Traps ---
-        function saveCurrentTags() {
-            if(!currentEntryId || !entries[currentEntryId]) return;
-            const val = document.getElementById('tagInputField').value;
-            // Clean formats up into array matching structures
-            const tags = val.split(',')
-                            .map(t => t.trim().toLowerCase())
-                            .filter(t => t.length > 0)
-                            .map(t => t.startsWith('#') ? t : '#' + t);
-            entries[currentEntryId].tags = tags;
-            saveCurrentEntry(true);
-            renderEntryList();
-        }
-
-        // --- Template Engine Injections ---
-        function injectTemplate(type) {
-            const editor = document.getElementById('diaryText');
-            let boilerplate = '';
+            listEl.innerHTML = '';
             
-            if(type === 'gratitude') {
-                boilerplate = `<h3>🙏 Gratitude Journal</h3><ul><li data-emoji="🌸">&nbsp;Three tiny things that brought a smile today:</li><li data-emoji="✨">&nbsp;</li><li data-emoji="✨">&nbsp;</li><li data-emoji="✨">&nbsp;</li></ul><h3>🧸 Someone I appreciated today:</h3><p></p>`;
-            } else if(type === 'reflection') {
-                boilerplate = `<h3>💭 Daily Reflection</h3><p><b>Current Mindset / Vibe:</b> </p><h3>⭐ Peak Moment of the day:</h3><p></p><h3>🍂 What felt heavy or cluttering:</h3><p></p>`;
-            } else if(type === 'brain') {
-                boilerplate = `<h3>🧠 Creative Brain Dump</h3><p><i>Unfiltered thoughts flow space...</i></p><ul><li data-emoji="🎨">&nbsp;Raw Idea Spark: </li><li data-emoji="⚡">&nbsp;Actionable tasks tomorrow: </li></ul>`;
-            }
-            
-            editor.innerHTML = editor.innerHTML + boilerplate;
-            updateLiveStats();
-            saveCurrentEntry(true);
-        }
-
-        // --- Polaroid Photo Gallery Board Wall System ---
-        function toggleGalleryView() {
-            isGalleryViewActive = !isGalleryViewActive;
-            const wall = document.getElementById('galleryWallView');
-            const editorCont = document.getElementById('editorContainer');
-            const goalCont = document.getElementById('goalContainer');
-            const toggleBtn = document.getElementById('viewToggleBtn');
-
-            if(isGalleryViewActive) {
-                toggleBtn.innerText = "📝 Write Mode";
-                editorCont.style.display = 'none';
-                goalCont.style.display = 'none';
-                wall.style.display = 'grid';
-                buildGalleryWall();
-            } else {
-                toggleBtn.innerText = "🖼️ Gallery Wall";
-                wall.style.display = 'none';
-                if(currentEntryId) {
-                    editorCont.style.display = 'flex';
-                    goalCont.style.display = 'block';
-                }
-            }
-        }
-
-        function buildGalleryWall() {
-            const wall = document.getElementById('galleryWallView');
-            wall.innerHTML = '';
-            let imageFoundCount = 0;
-
-            Object.keys(entries).forEach(idStr => {
-                const entry = entries[idStr];
-                if(entry.assets && Array.isArray(entry.assets)) {
-                    entry.assets.forEach(asset => {
-                        if(asset.type === 'photo') {
-                            imageFoundCount++;
-                            const card = document.createElement('div');
-                            card.className = 'polaroid-card';
-                            card.onclick = () => {
-                                toggleGalleryView(); // Re-toggle write view state layer loop closure
-                                loadEntry(idStr);
-                            };
-                            card.innerHTML = `
-                                <img src="${asset.content}">
-                                <div class="caption">🌸 ${entry.display_date}</div>
-                            `;
-                            wall.appendChild(card);
-                        }
-                    });
-                }
-            });
-
-            if(imageFoundCount === 0) {
-                wall.innerHTML = `<div style="grid-column: 1/-1; text-align:center; font-style:italic; color:var(--text-muted); padding:3rem;">Your garden's photo wall hasn't sprouted images yet. Drop photos into entries first! 🖼️</div>`;
-            }
-        }
-
-        // --- Auto Save Pipeline ---
-        function startAutoSaveLoop() {
-            setInterval(() => {
-                if(currentEntryId && document.getElementById('editorContainer').style.display === 'flex' && !isTrashFolderOpen) {
-                    saveCurrentEntry(true);
-                    showAutosaveFlash();
-                }
-            }, 5000);
-        }
-
-        function showAutosaveFlash() {
-            const status = document.getElementById('autosaveStatus');
-            if(status) {
-                status.style.opacity = '1';
-                setTimeout(() => { status.style.opacity = '0'; }, 1500);
-            }
-        }
-
-        // --- Markdown Typing Hotkeys ---
-        function handleMarkdownAndShortcuts(e) {
-            if(e.key === ' ' || e.keyCode === 32) {
-                const selection = window.getSelection();
-                if(selection.rangeCount > 0) {
-                    const range = selection.getRangeAt(0);
-                    const currentNode = range.startContainer;
-                    const textContent = currentNode.textContent || '';
-                    const cursorOffset = range.startOffset;
+            Object.values(source)
+                .filter(e => (e.textLeft + ' ' + (e.textRight || '') + ' ' + (e.tags || '')).toLowerCase().includes(searchVal))
+                .reverse()
+                .forEach(e => {
+                    const item = document.createElement('div');
+                    item.className = 'entry-item' + (e.id === currentEntryId ? ' active' : '');
+                    item.onclick = () => loadEntry(e.id);
                     
-                    const textBeforeCursor = textContent.substring(0, cursorOffset);
-                    
-                    if(textBeforeCursor === '# ') {
-                        e.preventDefault();
-                        document.execCommand('formatBlock', false, '<h2>');
-                        currentNode.textContent = textContent.substring(cursorOffset);
-                    } else if(textBeforeCursor === '- ') {
-                        e.preventDefault();
-                        currentNode.textContent = textContent.substring(cursorOffset);
-                        insertCuteBullet('🌸');
-                    }
-                }
-            }
+                    const cleanText = (e.textLeft || '').replace(/<[^>]*>?/gm, '');
+                    item.innerHTML = `
+                        <div class="date">${e.date}</div>
+                        <div class="entry-meta-row">
+                            <span>${e.mood || '😊'}</span>
+                            <div class="preview">${cleanText || 'Empty entry...'}</div>
+                        </div>
+                    `;
+                    listEl.appendChild(item);
+                });
+
+            updateOverallStats();
         }
 
-        // --- Stats Analytics & Word Goal Progress Engine ---
+        // Live Stats & Word Count Progress
         function updateLiveStats() {
-            const text = document.getElementById('diaryText').innerText || '';
-            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            const textLeft = document.getElementById('diaryText').innerText || '';
+            const textRight = document.getElementById('diaryTextRight').innerText || '';
+            const words = (textLeft + ' ' + textRight).trim().split(/\s+/).filter(Boolean).length;
             
-            // Calculate and display progress bar steps
-            const bar = document.getElementById('goalBar');
-            const percentage = Math.min((words / WORD_GOAL_TARGET) * 100, 100);
-            bar.style.width = percentage + '%';
-            if(percentage >= 100) {
-                bar.classList.add('complete');
-            } else {
-                bar.classList.remove('complete');
-            }
+            const goalBar = document.getElementById('goalBar');
+            const pct = Math.min((words / 200) * 100, 100);
+            goalBar.style.width = pct + '%';
+            goalBar.classList.toggle('complete', pct >= 100);
+
+            showAutoSaveIndicator();
         }
 
-        function calculateGardenStats() {
-            const totalKeys = Object.keys(entries);
-            document.getElementById('statTotal').innerText = totalKeys.length;
+        function updateOverallStats() {
+            const allEntries = Object.values(entries);
+            document.getElementById('statTotal').innerText = allEntries.length;
             
-            let grandTotalWords = 0;
-            const moodCounts = {};
-            
-            totalKeys.forEach(k => {
-                const text = entries[k].text ? entries[k].text.replace(/<[^>]*>/g, '') : '';
-                if(text.trim() !== '') grandTotalWords += text.trim().split(/\s+/).length;
-                
-                const m = entries[k].mood || '😊';
-                moodCounts[m] = (moodCounts[m] || 0) + 1;
+            let wordTotal = 0;
+            let moodCounts = {};
+
+            allEntries.forEach(e => {
+                const text = ((e.textLeft || '') + ' ' + (e.textRight || '')).replace(/<[^>]*>?/gm, '');
+                wordTotal += text.trim().split(/\s+/).filter(Boolean).length;
+                moodCounts[e.mood] = (moodCounts[e.mood] || 0) + 1;
             });
-            
-            document.getElementById('statWords').innerText = grandTotalWords;
-            
+
+            document.getElementById('statWords').innerText = wordTotal;
+
             let topMood = '-';
             let maxCount = 0;
-            for(let m in moodCounts) {
-                if(moodCounts[m] > maxCount) {
+            for (let m in moodCounts) {
+                if (moodCounts[m] > maxCount) {
                     maxCount = moodCounts[m];
                     topMood = m;
                 }
             }
-            document.getElementById('statMood').innerText = topMood !== '-' ? `${topMood} (${maxCount})` : '-';
-            document.getElementById('statStreak').innerText = `${calculateStreak(totalKeys)} days`;
+            document.getElementById('statMood').innerText = topMood;
         }
 
-        function calculateStreak(entryKeys) {
-            if(entryKeys.length === 0) return 0;
-            const dates = entryKeys.map(k => {
-                return new Date(entries[k].display_date).setHours(0,0,0,0);
-            }).sort((a,b) => b - a);
+        function showAutoSaveIndicator() {
+            const indicator = document.getElementById('autosaveStatus');
+            indicator.style.opacity = '1';
+            clearTimeout(window.autosaveTimer);
+            window.autosaveTimer = setTimeout(() => {
+                indicator.style.opacity = '0';
+                saveCurrentEntry();
+            }, 1200);
+        }
+
+        // Text Editing Formatting & Templates
+        function formatDoc(cmd, value = null) {
+            document.execCommand(cmd, false, value);
+        }
+
+        function insertCuteBullet(bulletSymbol) {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
             
-            const uniqueDates = [...new Set(dates)];
-            let streak = 0;
-            let currentCheck = new Date().setHours(0,0,0,0);
+            const li = document.createElement('li');
+            li.setAttribute('data-emoji', bulletSymbol);
+            li.innerHTML = '&#8203;';
             
-            if(uniqueDates[0] && uniqueDates[0] !== currentCheck && uniqueDates[0] === currentCheck - 86400000) {
-                currentCheck = uniqueDates[0];
+            range.insertNode(li);
+        }
+
+        function injectTemplate(type) {
+            const editor = document.getElementById('diaryText');
+            let tmpl = '';
+            
+            if (type === 'gratitude') {
+                tmpl = '<h3>🙏 3 Things I am Grateful For:</h3><ul><li data-emoji="🌸"></li><li data-emoji="🌸"></li><li data-emoji="🌸"></li></ul>';
+            } else if (type === 'reflection') {
+                tmpl = '<h3>💭 Daily Reflection</h3><p><b>Best part of today:</b> </p><p><b>Something I learned:</b> </p>';
+            } else if (type === 'brain') {
+                tmpl = '<h3>🧠 Brain Dump</h3><p>Let it all out here...</p>';
             }
-            
-            for(let i=0; i<uniqueDates.length; i++) {
-                if(uniqueDates[i] === currentCheck) {
-                    streak++;
-                    currentCheck -= 86400000;
-                } else {
-                    break;
-                }
+
+            editor.innerHTML += tmpl;
+        }
+
+        function handleMarkdownAndShortcuts(e) {
+            if (e.key === 'Enter') {
+                // Formatting shortcuts like headers or lists
             }
-            return streak;
         }
 
-        // --- Secure Image Optimization Downscaler ---
-        function handleScrapbookImageUpload(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 450;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
-                    spawnAsset('photo', compressedDataUrl);
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-            e.target.value = '';
-        }
-
-        // --- File Importer Migration ---
-        function importBackup(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const parsed = JSON.parse(event.target.result);
-                    if(typeof parsed === 'object' && parsed !== null) {
-                        entries = Object.assign({}, entries, parsed);
-                        localStorage.setItem('private_floral_diary_entries', JSON.stringify(entries));
-                        renderEntryList();
-                        calculateGardenStats();
-                        alert("Your garden backup has safely bloomed back into view! 🌸✨");
-                        
-                        const sortedDates = Object.keys(entries).sort((a, b) => b.localeCompare(a));
-                        if (sortedDates.length > 0) loadEntry(sortedDates[0]);
-                    }
-                } catch(err) {
-                    alert("Oh dear, that backup file structure seems corrupted... 🍂");
-                }
-            };
-            reader.readAsText(file);
-            e.target.value = '';
-        }
-
-        // --- Formatting Subsystems ---
-        function formatDoc(cmd, val = null) {
-            document.execCommand(cmd, false, val);
-        }
-
-        function insertCuteBullet(emoji) {
-            formatDoc('insertHTML', `<ul><li data-emoji="${emoji}">&nbsp;</li></ul>`);
-        }
-
-        // --- Scrapbook Mechanics Engine ---
+        // Scrapbooking Assets & Floating Photos
         function spawnAsset(type, content) {
-            if(!currentEntryId) return;
-            const id = 'asset_' + Date.now();
-            const data = {
-                id: id,
+            if (!currentEntryId || !entries[currentEntryId]) return;
+
+            const asset = {
+                id: 'asset_' + Date.now(),
                 type: type,
                 content: content,
-                left: '120px',
-                top: '120px',
-                width: type === 'photo' ? '180px' : 'auto',
-                height: 'auto',
-                transform: 'rotate(0deg)',
-                frameClass: 'frame-none'
+                x: 40,
+                y: 40,
+                width: type === 'sticker' ? 60 : 180,
+                height: type === 'sticker' ? 60 : 180,
+                rotation: 0,
+                frame: 'none'
             };
-            rebuildAssetOnWorkspace(data);
-            saveCurrentEntry(true);
+
+            entries[currentEntryId].assets = entries[currentEntryId].assets || [];
+            entries[currentEntryId].assets.push(asset);
+            saveToLocalStorage();
+            renderAssetOnPage(asset);
         }
 
-        function rebuildAssetOnWorkspace(data) {
-            const parent = document.getElementById('editorContainer');
-            const asset = document.createElement('div');
-            asset.id = data.id;
-            asset.className = `scrapbook-asset ${data.type}-asset`;
-            asset.style.left = data.left;
-            asset.style.top = data.top;
-            if(data.width) asset.style.width = data.width;
-            if(data.height) asset.style.height = data.height;
-            if(data.transform) asset.style.transform = data.transform;
-            
-            asset.dataset.type = data.type;
-            asset.dataset.content = data.content;
-            asset.dataset.frameClass = data.frameClass || 'frame-none';
+        function handleScrapbookImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-            const wrapper = document.createElement('div');
-            wrapper.className = `asset-wrapper ${data.frameClass || 'frame-none'}`;
-
-            if(data.type === 'sticker') {
-                wrapper.style.fontSize = '2.5rem';
-                wrapper.innerText = data.content;
-            } else {
-                const img = document.createElement('img');
-                img.src = data.content;
-                wrapper.appendChild(img);
-            }
-
-            asset.appendChild(wrapper);
-
-            const del = document.createElement('div');
-            del.className = 'control-handle handle-delete';
-            del.innerHTML = '✕';
-            del.onclick = () => { asset.remove(); saveCurrentEntry(true); };
-            asset.appendChild(del);
-
-            const res = document.createElement('div');
-            res.className = 'control-handle handle-resize';
-            res.innerHTML = '⤡';
-            setupAssetResize(asset, res);
-            asset.appendChild(res);
-
-            const rot = document.createElement('div');
-            rot.className = 'control-handle handle-rotate';
-            rot.innerHTML = '↻';
-            setupAssetRotate(asset, rot);
-            asset.appendChild(rot);
-
-            if(data.type === 'photo') {
-                const frm = document.createElement('div');
-                frm.className = 'control-handle handle-frame';
-                frm.innerHTML = '🖼️';
-                frm.onclick = (e) => {
-                    e.stopPropagation();
-                    activeFrameAssetId = asset.id;
-                    const pop = document.getElementById('frameDropdown');
-                    pop.style.display = 'grid';
-                    const rect = frm.getBoundingClientRect();
-                    const pRect = parent.getBoundingClientRect();
-                    pop.style.left = (rect.left - pRect.left) + 'px';
-                    pop.style.top = (rect.top - pRect.top + 30) + 'px';
-                };
-                asset.appendChild(frm);
-            }
-
-            setupAssetDrag(asset);
-            parent.appendChild(asset);
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                spawnAsset('photo', evt.target.result);
+            };
+            reader.readAsDataURL(file);
         }
 
-        function applyFrameStyle(styleName) {
-            if(!activeFrameAssetId) return;
-            const asset = document.getElementById(activeFrameAssetId);
-            if(asset) {
-                const wrapper = asset.querySelector('.asset-wrapper');
-                wrapper.className = 'asset-wrapper';
-                asset.dataset.frameClass = 'frame-' + styleName;
-                if(styleName !== 'none') {
-                    wrapper.classList.add('frame-' + styleName);
-                }
-                saveCurrentEntry(true);
+        function clearScrapbookAssets() {
+            document.querySelectorAll('.scrapbook-asset').forEach(el => el.remove());
+        }
+
+        function renderAssetOnPage(asset) {
+            const container = document.getElementById('editorContainer');
+            const el = document.createElement('div');
+            el.className = `scrapbook-asset ${asset.type}-asset`;
+            el.id = asset.id;
+            el.style.left = asset.x + 'px';
+            el.style.top = asset.y + 'px';
+            el.style.width = asset.width + 'px';
+            el.style.height = asset.height + 'px';
+            el.style.transform = `rotate(${asset.rotation || 0}deg)`;
+
+            let innerContent = asset.type === 'sticker' 
+                ? `<div class="asset-wrapper" style="font-size: ${asset.width * 0.7}px;">${asset.content}</div>`
+                : `<div class="asset-wrapper frame-${asset.frame || 'none'}"><img src="${asset.content}"></div>`;
+
+            el.innerHTML = `
+                ${innerContent}
+                <div class="control-handle handle-delete" onclick="removeAsset('${asset.id}')">✕</div>
+                <div class="control-handle handle-resize" onmousedown="initResize(event, '${asset.id}')">↘</div>
+                ${asset.type === 'photo' ? `<div class="control-handle handle-frame" onclick="openFramePopup(event, '${asset.id}')">🖼️</div>` : ''}
+            `;
+
+            makeAssetDraggable(el, asset);
+            container.appendChild(el);
+        }
+
+        function makeAssetDraggable(el, asset) {
+            let posX = 0, posY = 0, initialX = 0, initialY = 0;
+
+            el.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                if (e.target.classList.contains('control-handle')) return;
+                e.preventDefault();
+                initialX = e.clientX;
+                initialY = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                posX = initialX - e.clientX;
+                posY = initialY - e.clientY;
+                initialX = e.clientX;
+                initialY = e.clientY;
+
+                asset.x = el.offsetLeft - posX;
+                asset.y = el.offsetTop - posY;
+                el.style.left = asset.x + "px";
+                el.style.top = asset.y + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                saveToLocalStorage();
+            }
+        }
+
+        function removeAsset(id) {
+            document.getElementById(id)?.remove();
+            if (currentEntryId && entries[currentEntryId]) {
+                entries[currentEntryId].assets = entries[currentEntryId].assets.filter(a => a.id !== id);
+                saveToLocalStorage();
+            }
+        }
+
+        function openFramePopup(e, assetId) {
+            e.stopPropagation();
+            activeFrameAssetId = assetId;
+            const popup = document.getElementById('frameDropdown');
+            popup.style.display = 'grid';
+            popup.style.left = e.clientX - 50 + 'px';
+            popup.style.top = e.clientY - 50 + 'px';
+        }
+
+        function applyFrameStyle(style) {
+            if (!activeFrameAssetId || !currentEntryId) return;
+            const asset = entries[currentEntryId].assets.find(a => a.id === activeFrameAssetId);
+            if (asset) {
+                asset.frame = style;
+                saveToLocalStorage();
+                loadEntry(currentEntryId);
             }
             document.getElementById('frameDropdown').style.display = 'none';
-            activeFrameAssetId = null;
         }
 
-        // --- Drag / Scale Interaction Mechanics ---
-        function setupAssetDrag(el) {
-            let startX, startY, initialLeft, initialTop;
-            el.addEventListener('mousedown', dragStart);
-            el.addEventListener('touchstart', dragStart, { passive: false });
-
-            function dragStart(e) {
-                if(e.target.classList.contains('control-handle')) return;
-                e.preventDefault();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                startX = clientX; startY = clientY;
-                initialLeft = parseInt(el.style.left) || 0;
-                initialTop = parseInt(el.style.top) || 0;
-                document.addEventListener('mousemove', dragMove);
-                document.addEventListener('mouseup', dragEnd);
-                document.addEventListener('touchmove', dragMove, { passive: false });
-                document.addEventListener('touchend', dragEnd);
-            }
-
-            function dragMove(e) {
-                e.preventDefault();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                el.style.left = (initialLeft + (clientX - startX)) + 'px';
-                el.style.top = (initialTop + (clientY - startY)) + 'px';
-            }
-
-            function dragEnd() {
-                document.removeEventListener('mousemove', dragMove);
-                document.removeEventListener('mouseup', dragEnd);
-                document.removeEventListener('touchmove', dragMove);
-                document.removeEventListener('touchend', dragEnd);
-                saveCurrentEntry(true);
-            }
+        // Gallery View
+        function toggleGalleryView() {
+            viewMode = viewMode === 'editor' ? 'gallery' : 'editor';
+            document.getElementById('editorContainer').style.display = viewMode === 'editor' ? 'flex' : 'none';
+            document.getElementById('galleryWallView').style.display = viewMode === 'gallery' ? 'grid' : 'none';
+            if (viewMode === 'gallery') renderGallery();
         }
 
-        function setupAssetResize(el, handle) {
-            let startWidth, startHeight, startX, startY;
-            handle.addEventListener('mousedown', resStart);
-            handle.addEventListener('touchstart', resStart, { passive: false });
-
-            function resStart(e) {
-                e.preventDefault(); e.stopPropagation();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                startX = clientX; startY = clientY;
-                startWidth = el.offsetWidth; startHeight = el.offsetHeight;
-                document.addEventListener('mousemove', resMove);
-                document.addEventListener('mouseup', resEnd);
-                document.addEventListener('touchmove', resMove, { passive: false });
-                document.addEventListener('touchend', resEnd);
-            }
-
-            function resMove(e) {
-                e.preventDefault();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                el.style.width = (startWidth + (clientX - startX)) + 'px';
-                if(el.dataset.type !== 'sticker') {
-                    el.style.height = (startHeight + (clientY - startY)) + 'px';
-                }
-            }
-
-            function resEnd() {
-                document.removeEventListener('mousemove', resMove);
-                document.removeEventListener('mouseup', resEnd);
-                document.removeEventListener('touchmove', resMove);
-                document.removeEventListener('touchend', resEnd);
-                saveCurrentEntry(true);
-            }
+        function renderGallery() {
+            const gallery = document.getElementById('galleryWallView');
+            gallery.innerHTML = '';
+            
+            Object.values(entries).forEach(e => {
+                const photos = (e.assets || []).filter(a => a.type === 'photo');
+                photos.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'polaroid-card';
+                    card.onclick = () => { toggleGalleryView(); loadEntry(e.id); };
+                    card.innerHTML = `<img src="${p.content}"><div class="caption">${e.date}</div>`;
+                    gallery.appendChild(card);
+                });
+            });
         }
 
-        function setupAssetRotate(el, handle) {
-            handle.addEventListener('mousedown', rotStart);
-            handle.addEventListener('touchstart', rotStart, { passive: false });
-
-            function rotStart(e) {
-                e.preventDefault(); e.stopPropagation();
-                document.addEventListener('mousemove', rotMove);
-                document.addEventListener('mouseup', rotEnd);
-                document.addEventListener('touchmove', rotMove, { passive: false });
-                document.addEventListener('touchend', rotEnd);
-            }
-
-            function rotMove(e) {
-                e.preventDefault();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                const rect = el.getBoundingClientRect();
-                const centerDiffX = clientX - (rect.left + rect.width/2);
-                const centerDiffY = clientY - (rect.top + rect.height/2);
-                let angle = Math.atan2(centerDiffY, centerDiffX) * (180 / Math.PI);
-                el.style.transform = `rotate(${angle}deg)`;
-            }
-
-            function rotEnd() {
-                document.removeEventListener('mousemove', rotMove);
-                document.removeEventListener('mouseup', rotEnd);
-                document.removeEventListener('touchmove', rotMove);
-                document.removeEventListener('touchend', rotEnd);
-                saveCurrentEntry(true);
-            }
+        // Storage & Backups
+        function saveToLocalStorage() {
+            localStorage.setItem('secret_diary_entries', JSON.stringify(entries));
+            localStorage.setItem('secret_diary_trash', JSON.stringify(trashBox));
         }
 
         function exportBackup() {
-            if(Object.keys(entries).length === 0) {
-                alert("Your garden contains no thoughts to harvest yet! 🌱");
-                return;
-            }
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(entries));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `private_garden_backup_${Date.now()}.json`);
-            dlAnchorElem.click();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ entries, trashBox }));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "my_diary_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importBackup(e) {
+            const fileReader = new FileReader();
+            fileReader.onload = function (evt) {
+                const data = JSON.parse(evt.target.result);
+                if (data.entries) {
+                    entries = data.entries;
+                    trashBox = data.trashBox || {};
+                    saveToLocalStorage();
+                    renderEntryList();
+                    alert("Backup imported successfully!");
+                }
+            };
+            fileReader.readAsText(e.target.files[0]);
         }
     </script>
-</body></html>
+</body>
+</html>
